@@ -15,16 +15,17 @@ public final class OrbitalCommand implements Listener, AutoCloseable {
     private record Cast(EquipmentSlot hand, FishHook hook, boolean stab) {}
     private final JavaPlugin plugin;
     private final OrbitalEngine engine;
+    private final NamespacedKey rodKey;
     private final Map<UUID, Cast> casts = new HashMap<>();
     private final Set<BukkitTask> pending = new HashSet<>();
-    public OrbitalCommand(JavaPlugin plugin, OrbitalEngine engine) { this.plugin = plugin; this.engine = engine; }
+    public OrbitalCommand(JavaPlugin plugin, OrbitalEngine engine) { this.plugin = plugin; this.engine = engine; this.rodKey = new NamespacedKey(plugin, "orbital_rod"); }
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onFish(PlayerFishEvent event) {
         if (event.isCancelled() || !OrbitalAccess.allowed(event.getPlayer())) return;
         Player player = event.getPlayer();
         if (event.getState() == PlayerFishEvent.State.FISHING) {
             EquipmentSlot hand = event.getHand();
-            if (hand != null && player.getInventory().getItem(hand).getType() == Material.FISHING_ROD)
+            if (hand != null && isRod(player.getInventory().getItem(hand)))
                 casts.put(player.getUniqueId(), new Cast(hand, event.getHook(), player.isSneaking()));
             return;
         }
@@ -39,7 +40,7 @@ public final class OrbitalCommand implements Listener, AutoCloseable {
         event.setExpToDrop(0);
         event.getHook().remove();
         ItemStack held = player.getInventory().getItem(cast.hand);
-        if (held == null || held.getType() != Material.FISHING_ROD) return;
+        if (!isRod(held)) return;
         try {
             Location target = aim(player);
             if (cast.stab) {
@@ -72,11 +73,47 @@ public final class OrbitalCommand implements Listener, AutoCloseable {
         }
         throw new IllegalArgumentException("Kein Block anvisiert (maximal 128 Bloecke). Kein Schuss ausgeloest.");
     }
+    private boolean isRod(ItemStack item) {
+        return item != null && item.getType() == Material.FISHING_ROD && item.hasItemMeta()
+            && item.getItemMeta().getPersistentDataContainer().get(rodKey, org.bukkit.persistence.PersistentDataType.STRING) != null;
+    }
+    public void completions(Player player) {
+        if (OrbitalAccess.allowed(player)) player.addCustomChatCompletions(List.of(".orbital", ".orbital give"));
+    }
+    @EventHandler public void onJoin(PlayerJoinEvent event) { completions(event.getPlayer()); }
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onChat(io.papermc.paper.event.player.ChatEvent event) {
+        String message = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(event.message()).trim();
+        if (!isCommand(message)) return;
+        event.setCancelled(true);
+        Player player = event.getPlayer();
+        if (!OrbitalAccess.allowed(player)) {
+            player.sendMessage(Component.text("Orbital ist ausschliesslich fuer Tobias30 freigeschaltet."));
+            return;
+        }
+        if (!message.equalsIgnoreCase(".orbital give")) {
+            player.sendMessage(Component.text("Verwendung: .orbital give")); return;
+        }
+        if (player.getInventory().firstEmpty() < 0) {
+            player.sendMessage(Component.text("Dein Inventar ist voll.")); return;
+        }
+        ItemStack rod = new ItemStack(Material.FISHING_ROD);
+        var meta = rod.getItemMeta();
+        meta.getPersistentDataContainer().set(rodKey, org.bukkit.persistence.PersistentDataType.STRING, "enabled");
+        rod.setItemMeta(meta);
+        player.getInventory().addItem(rod);
+        player.sendMessage(Component.text("Orbital-Angel erhalten. Normal auswerfen: Nuke. Schleichend auswerfen: Stab. Danach Block anvisieren und einholen."));
+    }
+    static boolean isCommand(String message) {
+        return message.equalsIgnoreCase(".orbital") || message.toLowerCase(Locale.ROOT).startsWith(".orbital ");
+    }
     @EventHandler public void onQuit(PlayerQuitEvent event) {
         Cast cast = casts.remove(event.getPlayer().getUniqueId());
         if (cast != null) cast.hook.remove();
     }
     @Override public void close() {
+        for (Player player : plugin.getServer().getOnlinePlayers())
+            if (OrbitalAccess.allowed(player)) player.removeCustomChatCompletions(List.of(".orbital", ".orbital give"));
         pending.forEach(BukkitTask::cancel); pending.clear();
         casts.values().forEach(c -> c.hook.remove()); casts.clear();
     }

@@ -16,7 +16,7 @@ ohne Praefix entfaellt auch dessen Zwischenraum. Die Nachrichtenfarbe ist standa
 
 ## Installation
 
-1. `target/LPChat-1.3.1.jar` in den `plugins`-Ordner des Servers kopieren (alte LPChat-JAR ersetzen).
+1. `target/LPChat-1.3.2.jar` in den `plugins`-Ordner des Servers kopieren (alte LPChat-JAR ersetzen).
 2. LuckPerms installieren. Fuer Teams auch UltimateTeams und PlaceholderAPI installieren.
 3. Server neu starten. Die Einstellungen entstehen unter `plugins/LPChat/config.yml`.
 4. Andere Plugins, die den oeffentlichen Chat formatieren, entsprechend deaktivieren,
@@ -173,9 +173,10 @@ ausgelegt. Falls die interne Einstellung nicht verfuegbar ist, meldet LPChat das
 die Chatfunktionen laufen weiter. Es werden keine zusaetzlichen Schadenswerte oder
 Cooldowns simuliert. Andere Kampf- oder Anti-Cheat-Plugins koennen Swaps weiterhin beeinflussen.
 
-## Orbitals (ab 1.3.1)
+## Orbitals (ab 1.3.2)
 
-Nur Tobias30: Eine normale Angel auswerfen und einholen. Normales Auswerfen waehlt
+Nur Tobias30: `.orbital give` in den Chat schreiben. Die Nachricht wird nicht oeffentlich
+gesendet. Eine normal aussehende, intern markierte Angel wird ausgegeben. Diese auswerfen und einholen. Normales Auswerfen waehlt
 Nuke, Schleichen beim Auswerfen waehlt Stab. Andere Spieler angeln unveraendert.
 Die Angel zerbricht beim erfolgreichen Ausloesen, auch im Kreativmodus.
 Beim Einholen wird der erste feste Block in Blickrichtung als Ziel festgelegt
@@ -184,7 +185,8 @@ Stab erscheint nach 60 Serverticks (3 Sekunden bei 20 TPS) als senkrechte TNT-Sa
 Alle TNTs dieser Saeule explodieren gemeinsam im ersten Tick nach dem Erscheinen.
 Nuke faechert seine Ringe ueber dem anvisierten Block auf.
 
-Keine Orbital-Befehle, keine Orbital-Tab-Vorschlaege, kein Cooldown und keine
+Kein Slash-Befehl; `.orbital give` mit privater Rueckmeldung und Chat-Tab-Vorschlag
+nur fuer Tobias30. Kein Cooldown und keine
 Orbital-Einstellungen in LPChats config.yml. Alte Orbital-Eintraege werden beim
 Start entfernt. Zwei gleichzeitig aktive/vorgemerkte Schuesse bleiben als
 Mengenlimit bestehen; dies ist keine zeitliche Abklingzeit.

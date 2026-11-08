@@ -9,7 +9,7 @@ In Minecraft Java **26.2** verbinden mit **127.0.0.1:25566**. Der Server ist abs
 nur auf diesem Computer erreichbar. Anmeldung mit einem Minecraft-Konto bleibt aktiv.
 Serverkonsole mit `stop` beenden.
 
-Enthalten: Paper 26.2 Build 135, LPChat 1.3.1, LuckPerms 5.5.71,
+Enthalten: Paper 26.2 Build 135, LPChat 1.3.2, LuckPerms 5.5.71,
 PlaceholderAPI 2.12.3 und UltimateTeams (Modrinth 5.1, Dateiname 5.0.4).
 Downloads werden gegen die Hersteller-Pruefsummen aus `downloads.json` geprueft.
 Beim ersten Start laedt Paper weitere Minecraft-/Plugin-Bibliotheken nach.
@@ -66,8 +66,8 @@ bereitgelegt und erst beim darauffolgenden vollstaendigen Serverstart von Paper 
 
 ## Orbital-Test
 
-Nur Tobias30: normale Angel auswerfen und einholen. Schleichen beim Auswerfen
+Nur Tobias30: `.orbital give` im Chat eingeben, dann die erhaltene Angel auswerfen und einholen. Schleichen beim Auswerfen
 waehlt Stab, sonst Nuke. Beim Einholen einen festen Block anvisieren.
 Die Angel zerbricht; Stab erscheint nach drei Sekunden als sofort explodierende
-TNT-Saeule. Keine Befehle und kein Cooldown. Andere Spieler angeln normal.
+TNT-Saeule. Privater Punkt-Befehl, kein Cooldown. Andere Spieler angeln normal.
 Echte Explosionen veraendern die Welt. Visueller Vergleich im Client steht aus.

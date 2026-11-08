@@ -60,6 +60,7 @@ public final class LPChatPlugin extends JavaPlugin implements Listener {
         orbitals = new de.lpchat.orbital.OrbitalEngine(this);
         orbitalCommand = new de.lpchat.orbital.OrbitalCommand(this, orbitals);
         getServer().getPluginManager().registerEvents(orbitalCommand, this);
+        getServer().getOnlinePlayers().forEach(orbitalCommand::completions);
         if (getConfig().getBoolean("attribute-swapping.enabled", true)) {
             try {
                 attributeSwapping = PaperAttributeSwapping.enable();
