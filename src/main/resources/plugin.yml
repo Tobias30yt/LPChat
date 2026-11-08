@@ -1,0 +1,52 @@
+name: LPChat
+version: 1.0.0
+main: de.lpchat.LPChatPlugin
+api-version: '26.2'
+description: LuckPerms-Praefixe, UltimateTeams und Chatfarben nach Anzahl.
+depend: [LuckPerms]
+softdepend: [PlaceholderAPI, UltimateTeams]
+commands:
+  chatcolor:
+    description: Waehle deine Chatfarbe.
+    usage: /chatcolor [Farbe|reset]
+    aliases: [chatfarbe]
+    permission: chatcolor.use
+permissions:
+  chatcolor.use:
+    description: Oeffnet die Farbauswahl.
+    default: true
+  chatcolor.*:
+    description: Schaltet alle Chatfarben frei.
+    default: op
+  chatcolor.1:
+    default: false
+  chatcolor.2:
+    default: false
+  chatcolor.3:
+    default: false
+  chatcolor.4:
+    default: false
+  chatcolor.5:
+    default: false
+  chatcolor.6:
+    default: false
+  chatcolor.7:
+    default: false
+  chatcolor.8:
+    default: false
+  chatcolor.9:
+    default: false
+  chatcolor.10:
+    default: false
+  chatcolor.11:
+    default: false
+  chatcolor.12:
+    default: false
+  chatcolor.13:
+    default: false
+  chatcolor.14:
+    default: false
+  chatcolor.15:
+    default: false
+  chatcolor.16:
+    default: false

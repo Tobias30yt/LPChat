@@ -1,0 +1,30 @@
+# LuckPerms-Praefixe: legacy fuer &4Supporter, minimessage fuer <dark_red>Supporter.
+prefix-format: legacy
+default-chat-color: white
+# chatcolor.5 erlaubt die ersten fuenf Eintraege. Hoechste Zahl gewinnt.
+# Erlaubt sind die 16 Minecraft-Farbnamen; jede Farbe maximal einmal.
+color-order:
+  - white
+  - gray
+  - green
+  - aqua
+  - yellow
+  - gold
+  - red
+  - light_purple
+  - blue
+  - dark_green
+  - dark_aqua
+  - dark_red
+  - dark_purple
+  - dark_blue
+  - dark_gray
+  - black
+teams:
+  enabled: true
+  # UltimateTeams 4.7.5+, mit PlaceholderAPI.
+  membership-placeholder: '%ultimateteams_is_in_team%'
+  name-placeholder: '%ultimateteams_team_name%'
+  # Fallback, falls eine aeltere Expansion keinen Mitgliedschafts-Platzhalter hat.
+  # Hier ggf. den in UltimateTeams konfigurierten Kein-Team-Text ergaenzen.
+  empty-values: ['', 'none', 'null', 'no team', 'kein team', 'n/a']
