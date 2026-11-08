@@ -26,6 +26,10 @@ final class ChatFormat {
     }
 
     static Component header(Component team, Component prefix, String playerName) {
+        return header(team, prefix, playerName, NameStyle.DEFAULT);
+    }
+
+    static Component header(Component team, Component prefix, String playerName, NameStyle nameStyle) {
         Component header = Component.empty();
         if (!plain(team).isBlank()) {
             header = header.append(Component.text("(", NamedTextColor.GRAY))
@@ -37,7 +41,7 @@ final class ChatFormat {
                 header = header.append(Component.space());
             }
         }
-        return header.append(Component.text(playerName + "  ", NamedTextColor.GRAY));
+        return header.append(nameStyle.nameAndSeparator(playerName));
     }
 
     static Component render(Component header, Component message, NamedTextColor color) {

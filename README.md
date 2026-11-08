@@ -1,19 +1,22 @@
 # LPChat
 
+Autor: **tobias30**
+
 Paper **26.2**, Java **25 oder neuer**, LuckPerms. Team-Anzeige mit
 [UltimateTeams](https://modrinth.com/plugin/ultimate-teams) (4.7.5+) und PlaceholderAPI.
 
 ```text
-(Team) Supporter Tobias30  Yo was geht
+(Team) Supporter Tobias30 >>  Yo was geht
 ```
 
-Das Praefix kommt aus den aktiven LuckPerms-Metadaten, der Spielername ist grau.
-Vor der Nachricht stehen genau zwei Leerzeichen. Ohne Team entfaellt `(Team) `,
+Das Praefix kommt aus den aktiven LuckPerms-Metadaten, der Spielername ist standardmaessig grau.
+`>>` hat die Namensfarbe (bei einem Verlauf die Endfarbe). Danach stehen genau zwei
+Leerzeichen vor der Nachricht. Ohne Team entfaellt `(Team) `,
 ohne Praefix entfaellt auch dessen Zwischenraum. Die Nachrichtenfarbe ist standardmaessig weiss.
 
 ## Installation
 
-1. `target/LPChat-1.0.1.jar` in den `plugins`-Ordner des Servers kopieren (alte LPChat-JAR ersetzen).
+1. `target/LPChat-1.1.0.jar` in den `plugins`-Ordner des Servers kopieren (alte LPChat-JAR ersetzen).
 2. LuckPerms installieren. Fuer Teams auch UltimateTeams und PlaceholderAPI installieren.
 3. Server neu starten. Die Einstellungen entstehen unter `plugins/LPChat/config.yml`.
 4. Andere Plugins, die den oeffentlichen Chat formatieren, entsprechend deaktivieren,
@@ -51,6 +54,22 @@ Fuer MiniMessage-Praefixe `prefix-format: minimessage` einstellen.
 Nach Konfigurationsaenderungen den Server neu starten. Spielernachrichten werden
 nicht als Farbcodes oder MiniMessage interpretiert.
 
+## Namensfarben und Farbverlaeufe
+
+- `/namecolor`: Menue fuer eine einfarbige Namensfarbe; mit Schaltflaeche fuer Verlaeufe.
+- `/namecolor red`: Eine Farbe direkt auswaehlen.
+- `/namecolor gradient`: Zuerst Startfarbe, dann Endfarbe im Menue auswaehlen.
+- `/namecolor gradient aqua blue`: Verlauf direkt setzen.
+- `/namecolor gradient #ff5500 #55aaff`: Eigene Hex-Farben verwenden.
+- `/namecolor reset`: Zum grauen Standardnamen zurueckkehren.
+
+`namecolor.use` und `namecolor.gradient` sind standardmaessig fuer alle Spieler erlaubt.
+Sie koennen ueber LuckPerms eingeschraenkt werden. Namensfarben sind unabhaengig von
+den `chatcolor.N`-Freischaltungen. Name und `>>` verwenden die Namensfarbe,
+die Nachricht verwendet weiterhin die mit `/chatcolor` gewaehlte Farbe.
+Die Namensfarbe wird in den persistenten Spielerdaten gespeichert. Bei Entzug der
+benoetigten Berechtigung erscheint der Name wieder grau.
+
 ## UltimateTeams
 
 Die [offiziellen Platzhalter](https://ultimateteams.gitbook.io/ultimateteams-docs/hooks)
@@ -58,7 +77,17 @@ werden durch PlaceholderAPI aufgeloest: `%ultimateteams_is_in_team%` und
 `%ultimateteams_team_name%`. UltimateTeams liefert die Expansion selbst mit.
 Unaufgeloeste Platzhalter werden nicht angezeigt. Die Platzhalter sind konfigurierbar.
 Falls eine aeltere Expansion den Mitgliedschafts-Platzhalter nicht kennt, den
-Kein-Team-Text aus UltimateTeams unter `teams.empty-values` eintragen.
+Kein-Team-Text aus UltimateTeams unter `teams.empty-values` eintragen. Bei bestaetigter
+Teammitgliedschaft werden echte Teams mit Namen wie `None` oder `Kein Team` angezeigt.
+Fehlt die Expansion trotz aktivem PlaceholderAPI, wird ein nicht aufgeloester Teamname
+ausgeblendet und einmalig im Serverlog gemeldet.
+
+Die Integrationstests verwenden die unveraenderte, auf Modrinth als **5.1** veroeffentlichte
+UltimateTeams-JAR (Versions-ID `bWbGjJKk`, Dateiname `UltimateTeams-5.0.4.jar`).
+Dabei laufen die echte PlaceholderAPI-Ersetzung, die echte UltimateTeams-Expansion und
+der echte Team-/Allychat-Listener. Server, Spieler und Teamspeicher sind simuliert;
+das ist kein vollstaendiger Live-Servertest. UltimateTeams wird nur fuer Tests geladen
+und nicht in die LPChat-JAR eingebaut.
 
 ## Attribute-Swapping
 
@@ -94,10 +123,11 @@ mvn clean verify
 ```
 
 Automatische Tests pruefen Farblimits, Rechteverlust, Chatformat, Farbisolation,
-unveraenderten Nachrichtentext und das Setzen/Zuruecknehmen der Paper-Einstellung
-an Test-Konfigurationsobjekten. Fuer den abschliessenden Servertest:
+unveraenderten Nachrichtentext, Namensfarben/Verlaeufe, UltimateTeams sowie das
+Setzen/Zuruecknehmen der Paper-Einstellung an Test-Konfigurationsobjekten.
+Fuer den abschliessenden Servertest:
 
-1. Mit und ohne Team schreiben; Praefix, Farben und zwei Leerzeichen kontrollieren.
+1. Mit und ohne Team schreiben; Praefix, Farben und `>>` mit zwei Leerzeichen kontrollieren.
 2. `chatcolor.5` geben: Die ersten fuenf Farben sind waehlbar, `gold` ist gesperrt.
 3. Farbe waehlen, aus-/einloggen und Server neustarten; Auswahl bleibt erhalten.
 4. Berechtigung entfernen: Folgende Nachrichten nutzen die Standardfarbe.
@@ -105,3 +135,5 @@ an Test-Konfigurationsobjekten. Fuer den abschliessenden Servertest:
 6. UltimateTeams-Team-/Allychat pruefen: keine Nachrichten bei unbeteiligten Spielern.
 7. Startmeldung `Attribute-Swapping aktiviert` pruefen und Waffen-Swaps im Spiel testen.
 8. `attribute-swapping.enabled: false` setzen und neu starten: Papers eigene Einstellung gilt.
+9. `/namecolor` und `/namecolor gradient` durchklicken; Farbe nach Aus-/Einloggen und Neustart pruefen.
+10. Namensfarbe/Verlauf, `>>` und unabhaengige Nachrichtenfarbe gemeinsam pruefen.

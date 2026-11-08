@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.lpchat</groupId>
   <artifactId>lp-chat</artifactId>
-  <version>1.0.1</version>
+  <version>1.1.0</version>
   <properties>
     <maven.compiler.release>25</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -11,18 +11,27 @@
   <repositories>
     <repository><id>papermc</id><url>https://repo.papermc.io/repository/maven-public/</url></repository>
     <repository><id>placeholderapi</id><url>https://repo.helpch.at/releases/</url></repository>
+    <repository><id>modrinth</id><url>https://api.modrinth.com/maven</url></repository>
+    <repository><id>opencollab</id><url>https://repo.opencollab.dev/main/</url></repository>
   </repositories>
   <dependencies>
     <dependency><groupId>io.papermc.paper</groupId><artifactId>paper-api</artifactId><version>26.2.build.135-stable</version><scope>provided</scope></dependency>
     <dependency><groupId>net.luckperms</groupId><artifactId>api</artifactId><version>5.4</version><scope>provided</scope></dependency>
     <dependency><groupId>me.clip</groupId><artifactId>placeholderapi</artifactId><version>2.11.6</version><scope>provided</scope><exclusions><exclusion><groupId>*</groupId><artifactId>*</artifactId></exclusion></exclusions></dependency>
     <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter</artifactId><version>5.11.4</version><scope>test</scope></dependency>
+    <dependency><groupId>org.mockito</groupId><artifactId>mockito-core</artifactId><version>5.23.0</version><scope>test</scope></dependency>
+    <!-- Original published UltimateTeams 5.1 (artifact filename 5.0.4), tests only. -->
+    <dependency><groupId>maven.modrinth</groupId><artifactId>ultimate-teams</artifactId><version>bWbGjJKk</version><scope>test</scope></dependency>
+    <!-- UltimateTeams exposes this optional API in a method signature; needed by test instrumentation. -->
+    <dependency><groupId>org.geysermc.floodgate</groupId><artifactId>api</artifactId><version>2.2.5-SNAPSHOT</version><scope>test</scope></dependency>
   </dependencies>
   <build>
     <finalName>LPChat-${project.version}</finalName>
     <plugins>
       <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-compiler-plugin</artifactId><version>3.14.1</version></plugin>
-      <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-surefire-plugin</artifactId><version>3.5.4</version></plugin>
+      <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-surefire-plugin</artifactId><version>3.5.4</version>
+        <configuration><systemPropertyVariables><net.bytebuddy.experimental>true</net.bytebuddy.experimental></systemPropertyVariables></configuration>
+      </plugin>
       <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-jar-plugin</artifactId><version>3.4.2</version></plugin>
     </plugins>
   </build>
