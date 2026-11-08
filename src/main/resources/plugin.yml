@@ -1,5 +1,5 @@
 name: LPChat
-version: 1.2.0
+version: 1.3.0
 author: tobias30
 main: de.lpchat.LPChatPlugin
 api-version: '26.2'
@@ -7,6 +7,10 @@ description: LuckPerms-Praefixe, UltimateTeams, Chatfarben und Attribute-Swappin
 depend: [LuckPerms]
 softdepend: [PlaceholderAPI, UltimateTeams]
 commands:
+  orbital:
+    description: Orbital-TNT fuer Tobias30.
+    usage: /orbital help
+    aliases: [ob]
   namecolor:
     description: Waehle deine Namensfarbe oder einen Farbverlauf.
     usage: /namecolor [Farbe|gradient [Startfarbe Endfarbe]|flag [Flagge]|reset]

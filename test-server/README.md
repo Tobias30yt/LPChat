@@ -9,7 +9,7 @@ In Minecraft Java **26.2** verbinden mit **127.0.0.1:25566**. Der Server ist abs
 nur auf diesem Computer erreichbar. Anmeldung mit einem Minecraft-Konto bleibt aktiv.
 Serverkonsole mit `stop` beenden.
 
-Enthalten: Paper 26.2 Build 135, LPChat 1.2.0, LuckPerms 5.5.71,
+Enthalten: Paper 26.2 Build 135, LPChat 1.3.0, LuckPerms 5.5.71,
 PlaceholderAPI 2.12.3 und UltimateTeams (Modrinth 5.1, Dateiname 5.0.4).
 Downloads werden gegen die Hersteller-Pruefsummen aus `downloads.json` geprueft.
 Beim ersten Start laedt Paper weitere Minecraft-/Plugin-Bibliotheken nach.
@@ -24,6 +24,9 @@ powershell -NoProfile -ExecutionPolicy RemoteSigned -File .\test-server\setup.ps
 
 `setup.ps1` installiert die festgelegten Testversionen und kopiert die gebaute
 LPChat-JAR. Nur explizit ausfuehren, wenn diese Versionen gewuenscht sind.
+Das Setup setzt `max-tnt-per-tick: -1` in der Testserver-`spigot.yml`, damit
+Orbital-Ringe gleichzeitig simuliert werden. Diese Einstellung gilt fuer alle TNTs;
+LPChat begrenzt seine eigenen Schuesse separat. Setup bei gestopptem Server ausfuehren.
 `launch.bat` kopiert keine alte JAR ueber ein automatisch heruntergeladenes Update.
 Welten, EULA, Logs und heruntergeladene JARs werden nicht in Git gespeichert.
 
@@ -52,6 +55,9 @@ Im Spiel:
 /namecolor flag trans
 /namecolor flag gay_men
 /namecolor flag lesbian
+/ob preview nuke 5
+/ob give nuke 5 true
+/ob give stab 1 true
 ```
 
 Danach Chat pruefen, das Team verlassen und erneut schreiben. Team-/Allychat mit
@@ -60,3 +66,19 @@ zum Testen des Fuenf-Farben-Limits den Spieler vorher mit `deop Tobias30` zuruec
 
 Auto-Updates: LPChat prueft beim Start GitHub. Eine neuere passende Release-JAR wird
 bereitgelegt und erst beim darauffolgenden vollstaendigen Serverstart von Paper installiert.
+
+## Orbital-Test
+
+Nur der eingeloggte Spieler **Tobias30** kann die Orbitals bedienen, auch andere
+Operatoren nicht. Die Angel wirft einen normalen Haken; Einholen feuert auf dessen
+Position. Mit `/ob cancel` alle noch aktiven Orbital-TNTs entfernen.
+In einem freien Testgebiet ausprobieren: echte Explosionen veraendern die Welt.
+Die Vorschau zeigt nur Partikel und verursacht keinen Schaden.
+Bei einem normalen Nuke-Schuss fangen TNTs gebuendelt an und faechern waehrend
+des Fallens zu Ringen auf. Stab zeigt eine senkrechte, von oben nach unten
+explodierende TNT-Saeule. Vanilla-Bedrock bleibt erhalten.
+
+Zum Zugriffstest die Angel einem zweiten Spieler geben und dort Einholen,
+`/ob nuke` sowie `/lpchat:orbital nuke` versuchen: alle muessen gesperrt bleiben.
+Cooldown (10 Sekunden), Chunkgrenze und `/ob cancel` pruefen.
+Ein visueller Vergleich mit cubicmetres Aufnahme muss im Minecraft-Client erfolgen.
