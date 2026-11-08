@@ -21,6 +21,7 @@ public final class LPChatPlugin extends JavaPlugin implements Listener {
     private NamespacedKey selectionKey;
     private List<String> colors;
     private NamedTextColor defaultColor;
+    private PaperAttributeSwapping attributeSwapping;
 
     @Override
     public void onEnable() {
@@ -46,9 +47,31 @@ public final class LPChatPlugin extends JavaPlugin implements Listener {
         Objects.requireNonNull(getCommand("chatcolor")).setTabCompleter(menu);
         getServer().getPluginManager().registerEvents(menu, this);
         getServer().getPluginManager().registerEvents(this, this);
+        if (getConfig().getBoolean("attribute-swapping.enabled", true)) {
+            try {
+                attributeSwapping = PaperAttributeSwapping.enable();
+                getLogger().info("Attribute-Swapping aktiviert (Paper equipment updates = false).");
+            } catch (ReflectiveOperationException | RuntimeException | LinkageError exception) {
+                getLogger().warning("Attribute-Swapping konnte nicht aktiviert werden: " + exception
+                        + ". Alternativ in config/paper-global.yml unter unsupported-settings "
+                        + "update-equipment-on-player-actions: false setzen und den Server neu starten.");
+            }
+        }
         if (getConfig().getBoolean("teams.enabled")
                 && !getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             getLogger().warning("Team-Anzeige benoetigt PlaceholderAPI und UltimateTeams.");
+        }
+    }
+
+    @Override
+    public void onDisable() {
+        if (attributeSwapping == null) return;
+        try {
+            attributeSwapping.close();
+        } catch (ReflectiveOperationException | RuntimeException exception) {
+            getLogger().warning("Paper-Einstellung konnte nicht wiederhergestellt werden: " + exception);
+        } finally {
+            attributeSwapping = null;
         }
     }
 

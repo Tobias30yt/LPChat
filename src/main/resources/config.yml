@@ -1,6 +1,11 @@
 # LuckPerms-Praefixe: legacy fuer &4Supporter, minimessage fuer <dark_red>Supporter.
 prefix-format: legacy
 default-chat-color: white
+# Erlaubt Attribute-Swapping serverweit ab Plugin-Start (auch bei alter config.yml).
+# Setzt Papers update-equipment-on-player-actions im Speicher auf false.
+# Mit false behaelt Paper seinen eigenen Wert. Aenderung erfordert einen Neustart.
+attribute-swapping:
+  enabled: true
 # chatcolor.5 erlaubt die ersten fuenf Eintraege. Hoechste Zahl gewinnt.
 # Erlaubt sind die 16 Minecraft-Farbnamen; jede Farbe maximal einmal.
 color-order:

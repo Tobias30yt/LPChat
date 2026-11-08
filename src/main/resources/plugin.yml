@@ -1,8 +1,8 @@
 name: LPChat
-version: 1.0.0
+version: 1.0.1
 main: de.lpchat.LPChatPlugin
 api-version: '26.2'
-description: LuckPerms-Praefixe, UltimateTeams und Chatfarben nach Anzahl.
+description: LuckPerms-Praefixe, UltimateTeams, Chatfarben und Attribute-Swapping.
 depend: [LuckPerms]
 softdepend: [PlaceholderAPI, UltimateTeams]
 commands:

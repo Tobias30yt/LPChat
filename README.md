@@ -13,7 +13,7 @@ ohne Praefix entfaellt auch dessen Zwischenraum. Die Nachrichtenfarbe ist standa
 
 ## Installation
 
-1. `target/LPChat-1.0.0.jar` in den `plugins`-Ordner des Servers kopieren.
+1. `target/LPChat-1.0.1.jar` in den `plugins`-Ordner des Servers kopieren (alte LPChat-JAR ersetzen).
 2. LuckPerms installieren. Fuer Teams auch UltimateTeams und PlaceholderAPI installieren.
 3. Server neu starten. Die Einstellungen entstehen unter `plugins/LPChat/config.yml`.
 4. Andere Plugins, die den oeffentlichen Chat formatieren, entsprechend deaktivieren,
@@ -60,6 +60,31 @@ Unaufgeloeste Platzhalter werden nicht angezeigt. Die Platzhalter sind konfiguri
 Falls eine aeltere Expansion den Mitgliedschafts-Platzhalter nicht kennt, den
 Kein-Team-Text aus UltimateTeams unter `teams.empty-values` eintragen.
 
+## Attribute-Swapping
+
+Ab Version 1.0.1 aktiviert LPChat Attribute-Swapping beim Start serverweit. Das gilt
+auch beim Update mit einer bestehenden LPChat-Konfiguration ohne den neuen Eintrag.
+Zum Abschalten der LPChat-Anpassung in `plugins/LPChat/config.yml` eintragen:
+
+```yaml
+attribute-swapping:
+  enabled: false
+```
+
+Danach den Server vollstaendig neu starten. `false` laesst Papers eigene Einstellung gelten.
+Standardmaessig ist die Funktion mit `enabled: true` aktiv.
+
+LPChat setzt die [Paper-Einstellung `unsupported-settings.update-equipment-on-player-actions`](https://docs.papermc.io/paper/reference/global-configuration/#unsupported-settings_update-equipment-on-player-actions)
+im Speicher auf `false`. Die Paper-Datei wird nicht veraendert. Beim Deaktivieren von
+LPChat wird eine von LPChat vorgenommene Aenderung am bisherigen Konfigurationsobjekt
+zurueckgenommen. Nach einem Paper-Konfigurationsreload kann die Einstellung wieder
+Papers Dateiwert entsprechen; zum erneuten Aktivieren den Server neu starten.
+
+Der Zugriff erfolgt ueber Papers interne Konfigurationsklasse und ist fuer Paper 26.2
+ausgelegt. Falls die interne Einstellung nicht verfuegbar ist, meldet LPChat das im Log;
+die Chatfunktionen laufen weiter. Es werden keine zusaetzlichen Schadenswerte oder
+Cooldowns simuliert. Andere Kampf- oder Anti-Cheat-Plugins koennen Swaps weiterhin beeinflussen.
+
 ## Bauen und pruefen
 
 Mit JDK 25+ und Maven:
@@ -68,8 +93,9 @@ Mit JDK 25+ und Maven:
 mvn clean verify
 ```
 
-Automatische Tests pruefen Farblimits, Rechteverlust, Chatformat, Farbisolation und
-unveraenderten Nachrichtentext. Fuer den abschliessenden Servertest:
+Automatische Tests pruefen Farblimits, Rechteverlust, Chatformat, Farbisolation,
+unveraenderten Nachrichtentext und das Setzen/Zuruecknehmen der Paper-Einstellung
+an Test-Konfigurationsobjekten. Fuer den abschliessenden Servertest:
 
 1. Mit und ohne Team schreiben; Praefix, Farben und zwei Leerzeichen kontrollieren.
 2. `chatcolor.5` geben: Die ersten fuenf Farben sind waehlbar, `gold` ist gesperrt.
@@ -77,3 +103,5 @@ unveraenderten Nachrichtentext. Fuer den abschliessenden Servertest:
 4. Berechtigung entfernen: Folgende Nachrichten nutzen die Standardfarbe.
 5. Im Menue Shift-Klick, Zahlentasten, Doppelklick und Ziehen pruefen: keine Gegenstaende entnehmbar.
 6. UltimateTeams-Team-/Allychat pruefen: keine Nachrichten bei unbeteiligten Spielern.
+7. Startmeldung `Attribute-Swapping aktiviert` pruefen und Waffen-Swaps im Spiel testen.
+8. `attribute-swapping.enabled: false` setzen und neu starten: Papers eigene Einstellung gilt.
