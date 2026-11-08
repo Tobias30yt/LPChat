@@ -24,9 +24,7 @@ powershell -NoProfile -ExecutionPolicy RemoteSigned -File .\test-server\setup.ps
 
 `setup.ps1` installiert die festgelegten Testversionen und kopiert die gebaute
 LPChat-JAR. Nur explizit ausfuehren, wenn diese Versionen gewuenscht sind.
-Das Setup setzt `max-tnt-per-tick: -1` in der Testserver-`spigot.yml`, damit
-Orbital-Ringe gleichzeitig simuliert werden. Diese Einstellung gilt fuer alle TNTs;
-LPChat begrenzt seine eigenen Schuesse separat. Setup bei gestopptem Server ausfuehren.
+Setup bei gestopptem Server ausfuehren.
 `launch.bat` kopiert keine alte JAR ueber ein automatisch heruntergeladenes Update.
 Welten, EULA, Logs und heruntergeladene JARs werden nicht in Git gespeichert.
 
@@ -64,10 +62,3 @@ zum Testen des Fuenf-Farben-Limits den Spieler vorher mit `deop Tobias30` zuruec
 Auto-Updates: LPChat prueft beim Start GitHub. Eine neuere passende Release-JAR wird
 bereitgelegt und erst beim darauffolgenden vollstaendigen Serverstart von Paper installiert.
 
-## Orbital-Test
-
-Nur Tobias30: `.orbital give` im Chat eingeben, dann die erhaltene Angel auswerfen und einholen. Schleichen beim Auswerfen
-waehlt Stab, sonst Nuke. Beim Einholen einen festen Block anvisieren.
-Die Angel zerbricht; Stab erscheint nach drei Sekunden als sofort explodierende
-TNT-Saeule. Privater Punkt-Befehl, kein Cooldown. Andere Spieler angeln normal.
-Echte Explosionen veraendern die Welt. Visueller Vergleich im Client steht aus.
