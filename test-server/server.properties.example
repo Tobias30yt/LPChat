@@ -1,0 +1,18 @@
+# Local LPChat test server. Change deliberately if LAN access is needed.
+server-ip=127.0.0.1
+server-port=25566
+online-mode=true
+motd=LPChat Testserver - Paper 26.2
+max-players=5
+gamemode=creative
+force-gamemode=true
+difficulty=peaceful
+pvp=true
+allow-flight=true
+spawn-protection=0
+view-distance=6
+simulation-distance=4
+level-name=testworld
+enable-rcon=false
+enable-query=false
+enable-command-block=false

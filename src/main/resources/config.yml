@@ -1,6 +1,11 @@
 # LuckPerms-Praefixe: legacy fuer &4Supporter, minimessage fuer <dark_red>Supporter.
 prefix-format: legacy
 default-chat-color: white
+# Beim Start neuestes stabiles Release aus Tobias30yt/LPChat pruefen und herunterladen.
+# Installation erfolgt durch Paper beim DARAUFFOLGENDEN Serverstart.
+# Kein GitHub-Token erforderlich. Mit false werden keine GitHub-Anfragen gesendet.
+auto-update:
+  enabled: true
 # Erlaubt Attribute-Swapping serverweit ab Plugin-Start (auch bei alter config.yml).
 # Setzt Papers update-equipment-on-player-actions im Speicher auf false.
 # Mit false behaelt Paper seinen eigenen Wert. Aenderung erfordert einen Neustart.

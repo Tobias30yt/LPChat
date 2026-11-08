@@ -1,3 +1,10 @@
 /target/
 /.idea/
 *.iml
+/test-server/*
+!/test-server/launch.bat
+!/test-server/start.ps1
+!/test-server/setup.ps1
+!/test-server/README.md
+!/test-server/server.properties.example
+!/test-server/downloads.json

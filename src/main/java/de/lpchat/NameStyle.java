@@ -6,12 +6,18 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 
-record NameStyle(TextColor start, TextColor end) {
+record NameStyle(TextColor start, TextColor end, PrideFlag flag) {
     static final NameStyle DEFAULT = new NameStyle(NamedTextColor.GRAY, NamedTextColor.GRAY);
 
     NameStyle {
         Objects.requireNonNull(start);
         Objects.requireNonNull(end);
+    }
+
+    NameStyle(TextColor start, TextColor end) { this(start, end, null); }
+
+    static NameStyle flag(PrideFlag flag) {
+        return new NameStyle(flag.colors().getFirst(), flag.colors().getLast(), flag);
     }
 
     static TextColor color(String value) {
@@ -23,6 +29,10 @@ record NameStyle(TextColor start, TextColor end) {
 
     static NameStyle fromStored(String stored) {
         if (stored == null) return DEFAULT;
+        if (stored.startsWith("flag:")) {
+            PrideFlag flag = PrideFlag.find(stored.substring(5));
+            return flag == null ? DEFAULT : flag(flag);
+        }
         String[] colors = stored.split(":", -1);
         if (colors.length != 2) return DEFAULT;
         TextColor start = color(colors[0]);
@@ -30,18 +40,19 @@ record NameStyle(TextColor start, TextColor end) {
         return start == null || end == null ? DEFAULT : new NameStyle(start, end);
     }
 
-    String stored() { return start.asHexString() + ":" + end.asHexString(); }
+    String stored() { return flag != null ? "flag:" + flag.id() : start.asHexString() + ":" + end.asHexString(); }
 
-    boolean gradient() { return start.value() != end.value(); }
+    boolean gradient() { return flag == null && start.value() != end.value(); }
 
     Component nameAndSeparator(String name) {
         Component result = Component.empty().color(start);
         int[] characters = name.codePoints().toArray();
         for (int index = 0; index < characters.length; index++) {
             float position = characters.length < 2 ? 0 : (float) index / (characters.length - 1);
-            TextColor color = TextColor.lerp(position, start, end);
+            TextColor color = flag == null ? TextColor.lerp(position, start, end) : flag.colorAt(index, characters.length);
             result = result.append(Component.text(new String(Character.toChars(characters[index])), color));
         }
-        return result.append(Component.text(" >>  ", end));
+        TextColor separator = flag != null && characters.length > 0 ? flag.colorAt(characters.length - 1, characters.length) : end;
+        return result.append(Component.text(" >>  ", separator));
     }
 }

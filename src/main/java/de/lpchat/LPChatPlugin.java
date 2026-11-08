@@ -23,6 +23,7 @@ public final class LPChatPlugin extends JavaPlugin implements Listener {
     private List<String> colors;
     private NamedTextColor defaultColor;
     private PaperAttributeSwapping attributeSwapping;
+    private GitHubUpdater updater;
 
     @Override
     public void onEnable() {
@@ -67,10 +68,42 @@ public final class LPChatPlugin extends JavaPlugin implements Listener {
                 && !getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             getLogger().warning("Team-Anzeige benoetigt PlaceholderAPI und UltimateTeams.");
         }
+        startUpdater();
+    }
+
+    private void startUpdater() {
+        if (!getConfig().getBoolean("auto-update.enabled", true)) return;
+        if (getServer().getUpdateFolder().isBlank()) {
+            getLogger().warning("Auto-Update: Papers Updateordner ist deaktiviert (bukkit.yml).");
+            return;
+        }
+        var updateDirectory = getServer().getUpdateFolderFile().toPath().toAbsolutePath().normalize();
+        if (updateDirectory.equals(getDataFolder().toPath().toAbsolutePath().getParent().normalize())) {
+            getLogger().warning("Auto-Update: Der Updateordner darf nicht der plugins-Ordner selbst sein.");
+            return;
+        }
+        String current = getPluginMeta().getVersion();
+        String minecraft = getServer().getMinecraftVersion();
+        String fileName = getFile().getName();
+        updater = new GitHubUpdater();
+        GitHubUpdater taskUpdater = updater;
+        getServer().getScheduler().runTaskAsynchronously(this, () -> {
+            try {
+                getLogger().info(taskUpdater.checkAndStage(current, minecraft, updateDirectory, fileName));
+            } catch (InterruptedException exception) {
+                Thread.currentThread().interrupt();
+            } catch (Exception exception) {
+                getLogger().warning("Auto-Update nicht ausgefuehrt; installierte Version bleibt aktiv: " + exception.getMessage());
+            }
+        });
     }
 
     @Override
     public void onDisable() {
+        if (updater != null) {
+            updater.close();
+            updater = null;
+        }
         if (attributeSwapping == null) return;
         try {
             attributeSwapping.close();
@@ -100,6 +133,7 @@ public final class LPChatPlugin extends JavaPlugin implements Listener {
     NameStyle nameStyle(Player player) {
         if (!player.hasPermission("namecolor.use")) return NameStyle.DEFAULT;
         NameStyle style = NameStyle.fromStored(player.getPersistentDataContainer().get(nameStyleKey, PersistentDataType.STRING));
+        if (style.flag() != null && !player.hasPermission("namecolor.flags")) return NameStyle.DEFAULT;
         return style.gradient() && !player.hasPermission("namecolor.gradient") ? NameStyle.DEFAULT : style;
     }
 

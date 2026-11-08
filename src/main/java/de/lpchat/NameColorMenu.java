@@ -1,6 +1,7 @@
 package de.lpchat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import net.kyori.adventure.text.Component;
@@ -24,7 +25,7 @@ import org.bukkit.inventory.ItemStack;
 final class NameColorMenu implements TabExecutor, Listener {
     private static final List<String> COLORS = List.copyOf(NamedTextColor.NAMES.keys());
     private final LPChatPlugin plugin;
-    private enum Mode { SOLID, START, END }
+    private enum Mode { SOLID, START, END, FLAGS }
 
     NameColorMenu(LPChatPlugin plugin) { this.plugin = plugin; }
 
@@ -39,6 +40,7 @@ final class NameColorMenu implements TabExecutor, Listener {
                 case SOLID -> "Namensfarbe";
                 case START -> "Verlauf: Startfarbe";
                 case END -> "Verlauf: Endfarbe";
+                case FLAGS -> "Pride-Flaggen";
             };
             inventory = Bukkit.createInventory(this, 27, Component.text(title));
         }
@@ -54,6 +56,10 @@ final class NameColorMenu implements TabExecutor, Listener {
         if (!allowed(player, false)) return true;
         if (args.length == 0) {
             open(player, Mode.SOLID, null);
+        } else if (args[0].equalsIgnoreCase("flag") || args[0].equalsIgnoreCase("flags")) {
+            if (!allowedFlag(player)) return true;
+            if (args.length == 1) open(player, Mode.FLAGS, null);
+            else chooseFlag(player, String.join("_", Arrays.copyOfRange(args, 1, args.length)));
         } else if (args[0].equalsIgnoreCase("gradient")) {
             if (!allowed(player, true)) return true;
             if (args.length == 1) open(player, Mode.START, null);
@@ -67,6 +73,10 @@ final class NameColorMenu implements TabExecutor, Listener {
             plugin.selectNameStyle(player, null);
             player.sendMessage(Component.text("Deine Namensfarbe wurde zurueckgesetzt.", NamedTextColor.GREEN));
         } else if (args.length == 1) {
+            if (PrideFlag.find(args[0]) != null) {
+                chooseFlag(player, args[0]);
+                return true;
+            }
             TextColor color = NameStyle.color(args[0]);
             if (color == null) invalidColor(player);
             else save(player, new NameStyle(color, color));
@@ -82,9 +92,27 @@ final class NameColorMenu implements TabExecutor, Listener {
 
     private void save(Player player, NameStyle style) {
         if (!allowed(player, style.gradient())) return;
+        if (style.flag() != null && !allowedFlag(player)) return;
         plugin.selectNameStyle(player, style);
         player.sendMessage(Component.text("Dein Name im Chat: ", NamedTextColor.GRAY)
                 .append(style.nameAndSeparator(player.getName())));
+    }
+
+    private boolean allowedFlag(Player player) {
+        if (!allowed(player, false)) return false;
+        if (player.hasPermission("namecolor.flags")) return true;
+        player.sendMessage(Component.text("Dafuer hast du keine Berechtigung.", NamedTextColor.RED));
+        return false;
+    }
+
+    private void chooseFlag(Player player, String name) {
+        if (!allowedFlag(player)) return;
+        PrideFlag flag = PrideFlag.find(name);
+        if (flag == null) {
+            player.sendMessage(Component.text("Unbekannte Flagge. Oeffne /namecolor flag.", NamedTextColor.RED));
+            return;
+        }
+        save(player, NameStyle.flag(flag));
     }
 
     private void invalidColor(Player player) {
@@ -92,7 +120,7 @@ final class NameColorMenu implements TabExecutor, Listener {
     }
 
     private void usage(Player player) {
-        player.sendMessage(Component.text("/namecolor [Farbe|gradient [Startfarbe Endfarbe]|reset]", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("/namecolor [Farbe|gradient [Start Ende]|flag [Flagge]|reset]", NamedTextColor.GRAY));
     }
 
     private static ItemStack item(Material material, Component title) {
@@ -104,9 +132,19 @@ final class NameColorMenu implements TabExecutor, Listener {
     }
 
     private void open(Player player, Mode mode, TextColor start) {
-        if (!allowed(player, mode != Mode.SOLID)) return;
+        if (!allowed(player, mode == Mode.START || mode == Mode.END)) return;
+        if (mode == Mode.FLAGS && !allowedFlag(player)) return;
         Holder holder = new Holder(mode, start);
-        for (int index = 0; index < COLORS.size(); index++) {
+        for (int index = 0; index < (mode == Mode.FLAGS ? PrideFlag.values().length : COLORS.size()); index++) {
+            if (mode == Mode.FLAGS) {
+                PrideFlag flag = PrideFlag.values()[index];
+                ItemStack entry = item(Material.WHITE_BANNER, Component.text(flag.label(), NamedTextColor.WHITE));
+                var meta = entry.getItemMeta();
+                meta.lore(List.of(NameStyle.flag(flag).nameAndSeparator(player.getName()).decoration(TextDecoration.ITALIC, false)));
+                entry.setItemMeta(meta);
+                holder.inventory.setItem(index, entry);
+                continue;
+            }
             String name = COLORS.get(index);
             TextColor color = NameStyle.color(name);
             Component title = mode == Mode.END
@@ -118,6 +156,9 @@ final class NameColorMenu implements TabExecutor, Listener {
         if (mode == Mode.SOLID && player.hasPermission("namecolor.gradient")) {
             holder.inventory.setItem(24, item(Material.PRISMARINE_CRYSTALS, Component.text("Farbverlauf waehlen", NamedTextColor.AQUA)));
         }
+        if (mode == Mode.SOLID && player.hasPermission("namecolor.flags")) {
+            holder.inventory.setItem(25, item(Material.WHITE_BANNER, Component.text("Pride-Flaggen waehlen", NamedTextColor.LIGHT_PURPLE)));
+        }
         player.openInventory(holder.inventory);
     }
 
@@ -128,16 +169,23 @@ final class NameColorMenu implements TabExecutor, Listener {
         event.setCancelled(true);
         if (!(event.getWhoClicked() instanceof Player player)) return;
         int slot = event.getRawSlot();
-        if (slot != 22 && slot != 24 && (slot < 0 || slot >= COLORS.size())) return;
+        int count = holder.mode == Mode.FLAGS ? PrideFlag.values().length : COLORS.size();
+        if (slot != 22 && slot != 24 && slot != 25 && (slot < 0 || slot >= count)) return;
         Bukkit.getScheduler().runTask(plugin, () -> {
             if (!player.isOnline() || player.getOpenInventory().getTopInventory() != top) return;
-            if (!allowed(player, holder.mode != Mode.SOLID)) return;
+            if (!allowed(player, holder.mode == Mode.START || holder.mode == Mode.END)) return;
+            if (holder.mode == Mode.FLAGS && !allowedFlag(player)) return;
             if (slot == 22) {
                 plugin.selectNameStyle(player, null);
                 player.sendMessage(Component.text("Deine Namensfarbe wurde zurueckgesetzt.", NamedTextColor.GREEN));
                 player.closeInventory();
             } else if (slot == 24) {
                 if (holder.mode == Mode.SOLID) open(player, Mode.START, null);
+            } else if (slot == 25) {
+                if (holder.mode == Mode.SOLID) open(player, Mode.FLAGS, null);
+            } else if (holder.mode == Mode.FLAGS) {
+                chooseFlag(player, PrideFlag.values()[slot].id());
+                player.closeInventory();
             } else {
                 TextColor selected = NameStyle.color(COLORS.get(slot));
                 if (holder.mode == Mode.START) open(player, Mode.END, selected);
@@ -161,6 +209,10 @@ final class NameColorMenu implements TabExecutor, Listener {
         if (args.length == 1) {
             candidates.add("reset");
             if (sender.hasPermission("namecolor.gradient")) candidates.add("gradient");
+            if (sender.hasPermission("namecolor.flags")) candidates.add("flag");
+        } else if (args.length == 2 && (args[0].equalsIgnoreCase("flag") || args[0].equalsIgnoreCase("flags"))
+                && sender.hasPermission("namecolor.flags")) {
+            candidates = new ArrayList<>(Arrays.stream(PrideFlag.values()).map(PrideFlag::id).toList());
         } else if (args.length > 3 || !args[0].equalsIgnoreCase("gradient") || !sender.hasPermission("namecolor.gradient")) {
             return List.of();
         }

@@ -16,7 +16,7 @@ ohne Praefix entfaellt auch dessen Zwischenraum. Die Nachrichtenfarbe ist standa
 
 ## Installation
 
-1. `target/LPChat-1.1.0.jar` in den `plugins`-Ordner des Servers kopieren (alte LPChat-JAR ersetzen).
+1. `target/LPChat-1.2.0.jar` in den `plugins`-Ordner des Servers kopieren (alte LPChat-JAR ersetzen).
 2. LuckPerms installieren. Fuer Teams auch UltimateTeams und PlaceholderAPI installieren.
 3. Server neu starten. Die Einstellungen entstehen unter `plugins/LPChat/config.yml`.
 4. Andere Plugins, die den oeffentlichen Chat formatieren, entsprechend deaktivieren,
@@ -24,6 +24,40 @@ ohne Praefix entfaellt auch dessen Zwischenraum. Die Nachrichtenfarbe ist standa
 
 LPChat veraendert den Paper-Renderer, sendet keine eigene globale Kopie und respektiert
 abgebrochene Chatereignisse sowie deren Empfaenger. Team- und Allychat bleiben bei UltimateTeams.
+
+## Automatische GitHub-Updates
+
+Ab Version 1.2.0 prueft LPChat **bei jedem Serverstart im Hintergrund** das neueste
+stabile [GitHub-Release](https://github.com/Tobias30yt/LPChat/releases/latest).
+Neue Releases werden heruntergeladen und im von Paper konfigurierten Updateordner
+(normalerweise `plugins/update`) bereitgestellt. **Paper installiert das Update beim
+darauffolgenden Serverstart.** Es gibt keinen automatischen Neustart oder Hot-Reload.
+
+Version 1.2.0 muss einmal manuell installiert werden; aeltere LPChat-Versionen haben
+noch keinen Updater. Bestehende Konfigurationen funktionieren weiter, Auto-Updates
+sind standardmaessig aktiv. Zum Abschalten in `plugins/LPChat/config.yml` eintragen:
+
+```yaml
+auto-update:
+  enabled: false
+```
+
+Nach einem Neustart erfolgen dann keine Update-Anfragen mehr. Bereits heruntergeladene
+Updates im Paper-Updateordner werden dadurch nicht entfernt; Paper verarbeitet sie
+vor dem Start des Plugins. Bei Bedarf die bereitgelegte LPChat-JAR dort vor dem Neustart entfernen.
+
+Die Quelle ist fest `Tobias30yt/LPChat`. Ein GitHub-Token oder Git-Zugang ist nicht
+erforderlich. Synchronisiert werden veroeffentlichte Release-JARs, keine unveroeffentlichten
+Commits oder lokalen Einstellungen. Vorabversionen und Downgrades werden ignoriert.
+Downloadgroesse, GitHub-SHA256, Plugin-Identitaet, Release-Version, Mindest-Java und
+Minecraft-API werden geprueft. Ein unvollstaendiger Kandidat bleibt ausserhalb der
+von Paper gelesenen Update-Dateien. Erst nach erfolgreicher Pruefung wird die JAR
+atomar bereitgestellt. Bei Netzwerk-/Prueffehlern laeuft die installierte Version weiter.
+
+Wenn das neueste Release eine neuere Minecraft-/Java-Version voraussetzt, wird es
+nicht installiert. Netzwerkzugriff auf GitHub und dessen Release-Downloadserver sowie
+ein aktivierter, beschreibbarer [Paper-Updateordner](https://docs.papermc.io/paper/reference/bukkit-configuration/#settings_update-folder)
+sind erforderlich. Das Ergebnis steht im Serverlog.
 
 ## Farben und Berechtigungen
 
@@ -69,6 +103,31 @@ den `chatcolor.N`-Freischaltungen. Name und `>>` verwenden die Namensfarbe,
 die Nachricht verwendet weiterhin die mit `/chatcolor` gewaehlte Farbe.
 Die Namensfarbe wird in den persistenten Spielerdaten gespeichert. Bei Entzug der
 benoetigten Berechtigung erscheint der Name wieder grau.
+
+## LGBTQIA+-Flaggenfarben
+
+Im `/namecolor`-Menue gibt es jetzt **Pride-Flaggen** mit Vorschau. Alternativ:
+
+```text
+/namecolor flag
+/namecolor flag trans
+/namecolor flag gay_men
+/namecolor flag lesbian
+```
+
+Auch `/namecolor trans`, `/namecolor gay` und `/namecolor lesbian` funktionieren.
+Weitere Paletten: `rainbow`, `bisexual`, `pansexual`, `nonbinary`, `asexual`,
+`aromantic`, `agender`, `genderfluid`, `genderqueer` und `intersex`.
+
+Die Streifenfarben laufen von links nach rechts ueber die Buchstaben. `>>` hat die
+Farbe des letzten Buchstabens. Bei sehr kurzen Namen koennen nicht alle Streifen
+sichtbar sein. Intersex nutzt eine gelb-violett-gelbe Farbpalette; ein Kreis laesst
+sich in einer Textzeile nicht nachbilden. Die Paletten orientieren sich an den
+[beschriebenen Pride-Flaggen](https://rcsgd.sa.ucsb.edu/resources/lgbtqia-informational-resources/pride-flags-glossary).
+
+`namecolor.flags` ist standardmaessig fuer alle erlaubt, zusaetzlich zu `namecolor.use`.
+Es ist unabhaengig von `namecolor.gradient` und `chatcolor.N`. Die Auswahl wird wie
+andere Namensfarben gespeichert und mit `/namecolor reset` zurueckgesetzt.
 
 ## UltimateTeams
 
@@ -116,14 +175,23 @@ Cooldowns simuliert. Andere Kampf- oder Anti-Cheat-Plugins koennen Swaps weiterh
 
 ## Bauen und pruefen
 
+Ein lokaler Windows-Testserver fuer Paper 26.2 ist unter [`test-server`](test-server/README.md)
+vorbereitet. Start ueber `test-server/launch.bat`, Verbindung mit `127.0.0.1:25566`.
+
 Mit JDK 25+ und Maven:
 
 ```text
 mvn clean verify
 ```
 
+Optionaler echter GitHub-Downloadtest (nur temporaerer Testordner, keine Installation):
+
+```text
+mvn -Dlpchat.liveUpdateTest=true verify
+```
+
 Automatische Tests pruefen Farblimits, Rechteverlust, Chatformat, Farbisolation,
-unveraenderten Nachrichtentext, Namensfarben/Verlaeufe, UltimateTeams sowie das
+unveraenderten Nachrichtentext, Namensfarben/Verlaeufe/Flaggen, GitHub-Updates, UltimateTeams sowie das
 Setzen/Zuruecknehmen der Paper-Einstellung an Test-Konfigurationsobjekten.
 Fuer den abschliessenden Servertest:
 
@@ -137,3 +205,6 @@ Fuer den abschliessenden Servertest:
 8. `attribute-swapping.enabled: false` setzen und neu starten: Papers eigene Einstellung gilt.
 9. `/namecolor` und `/namecolor gradient` durchklicken; Farbe nach Aus-/Einloggen und Neustart pruefen.
 10. Namensfarbe/Verlauf, `>>` und unabhaengige Nachrichtenfarbe gemeinsam pruefen.
+11. Flaggenmenue, gespeicherte Flaggen und die Berechtigung `namecolor.flags` pruefen.
+12. Auf einem Testserver ein Update bereitstellen lassen, vollstaendig neu starten
+    und die geladene LPChat-Version kontrollieren. Dieser Neustart-Test ist noch offen.

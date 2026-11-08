@@ -1,0 +1,26 @@
+[
+  {
+    "path": "paper-26.2-135.jar",
+    "url": "https://fill-data.papermc.io/v1/objects/ef3dbc68b013deafdbbee3bebf1ba351671ebcda94a8f136809b7532d5ba2fe1/paper-26.2-135.jar",
+    "algorithm": "SHA256",
+    "hash": "ef3dbc68b013deafdbbee3bebf1ba351671ebcda94a8f136809b7532d5ba2fe1"
+  },
+  {
+    "path": "plugins/LuckPerms.jar",
+    "url": "https://cdn.modrinth.com/data/Vebnzrzj/versions/b0mk8uS6/LuckPerms-Bukkit-5.5.71.jar",
+    "algorithm": "SHA512",
+    "hash": "188a91f0a543d23bfda32385fca6db63d61e49c8a422bd452a260bd9cbc6a7d7fe45071199e9fca8f3ce43c2b41ee84fd315bd15464577028ff3951a7d4fab27"
+  },
+  {
+    "path": "plugins/PlaceholderAPI.jar",
+    "url": "https://cdn.modrinth.com/data/lKEzGugV/versions/pIvQcXW8/PlaceholderAPI-2.12.3.jar",
+    "algorithm": "SHA512",
+    "hash": "f048d55b633fd816c08e2e4472bd54a75fc4d13534682e6e7745408253d2f393706efdc389d12ca2cf28d4dc035a9afdda3eed9ecde51c7e332831391d9b6479"
+  },
+  {
+    "path": "plugins/UltimateTeams.jar",
+    "url": "https://cdn.modrinth.com/data/O5OQXCl8/versions/bWbGjJKk/UltimateTeams-5.0.4.jar",
+    "algorithm": "SHA512",
+    "hash": "6df818e1509558f529579d134f2b575ad39e8946f6a2e8aa8121cf8eb7f73d27e2c9e7a63659c3d54f51bc3cd4f336d207fdc4b41230160eafd6b6c04d92104f"
+  }
+]

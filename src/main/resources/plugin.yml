@@ -1,5 +1,5 @@
 name: LPChat
-version: 1.1.0
+version: 1.2.0
 author: tobias30
 main: de.lpchat.LPChatPlugin
 api-version: '26.2'
@@ -9,7 +9,7 @@ softdepend: [PlaceholderAPI, UltimateTeams]
 commands:
   namecolor:
     description: Waehle deine Namensfarbe oder einen Farbverlauf.
-    usage: /namecolor [Farbe|gradient [Startfarbe Endfarbe]|reset]
+    usage: /namecolor [Farbe|gradient [Startfarbe Endfarbe]|flag [Flagge]|reset]
     aliases: [namensfarbe]
     permission: namecolor.use
   chatcolor:
@@ -18,6 +18,9 @@ commands:
     aliases: [chatfarbe]
     permission: chatcolor.use
 permissions:
+  namecolor.flags:
+    description: Pride-Flaggen als Namensfarben verwenden.
+    default: true
   namecolor.use:
     description: Namensfarbe auswaehlen.
     default: true

@@ -17,6 +17,7 @@ class NameColorCommandTest {
         player = mock(Player.class);
         when(player.hasPermission("namecolor.use")).thenReturn(true);
         when(player.hasPermission("namecolor.gradient")).thenReturn(true);
+        when(player.hasPermission("namecolor.flags")).thenReturn(true);
         when(player.getName()).thenReturn("Tobias30");
         command = new NameColorMenu(plugin);
     }
@@ -33,6 +34,30 @@ class NameColorCommandTest {
     @Test void resetRemovesSavedSelection() {
         run("reset");
         verify(plugin).selectNameStyle(player, null);
+    }
+
+    @Test void flagCommandsAliasesAndTabCompletionWork() {
+        run("flag", "trans");
+        verify(plugin).selectNameStyle(player, NameStyle.flag(PrideFlag.TRANS));
+        run("flag", "gay", "men");
+        verify(plugin).selectNameStyle(player, NameStyle.flag(PrideFlag.GAY_MEN));
+        run("lesbian");
+        verify(plugin).selectNameStyle(player, NameStyle.flag(PrideFlag.LESBIAN));
+        assertTrue(command.onTabComplete(player, null, "namecolor", new String[]{"flag", "g"}).contains("gay_men"));
+    }
+
+    @Test void flagPermissionIsIndependentAndInvalidFlagsDoNotOverwrite() {
+        run("flag", "invalid");
+        verifyNoInteractions(plugin);
+        when(player.hasPermission("namecolor.flags")).thenReturn(false);
+        run("flag", "trans");
+        run("trans");
+        verifyNoInteractions(plugin);
+        assertTrue(command.onTabComplete(player, null, "namecolor", new String[]{"flag", ""}).isEmpty());
+        when(player.hasPermission("namecolor.flags")).thenReturn(true);
+        when(player.hasPermission("namecolor.gradient")).thenReturn(false);
+        run("flag", "trans");
+        verify(plugin).selectNameStyle(player, NameStyle.flag(PrideFlag.TRANS));
     }
 
     @Test void invalidInputNeverChangesSelection() {
