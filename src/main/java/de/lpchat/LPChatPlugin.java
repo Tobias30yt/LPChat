@@ -56,19 +56,10 @@ public final class LPChatPlugin extends JavaPlugin implements Listener {
         Objects.requireNonNull(getCommand("namecolor")).setTabCompleter(nameMenu);
         getServer().getPluginManager().registerEvents(nameMenu, this);
         getServer().getPluginManager().registerEvents(this, this);
-        if (getConfig().getBoolean("orbital.enabled", true)) {
-            orbitals = new de.lpchat.orbital.OrbitalEngine(this);
-            orbitalCommand = new de.lpchat.orbital.OrbitalCommand(this, orbitals);
-            Objects.requireNonNull(getCommand("orbital")).setExecutor(orbitalCommand);
-            Objects.requireNonNull(getCommand("orbital")).setTabCompleter(orbitalCommand);
-            getServer().getPluginManager().registerEvents(orbitalCommand, this);
-        } else {
-            Objects.requireNonNull(getCommand("orbital")).setExecutor((sender, command, label, args) -> {
-                sender.sendMessage(Component.text("Orbital ist deaktiviert.", NamedTextColor.RED));
-                return true;
-            });
-            Objects.requireNonNull(getCommand("orbital")).setTabCompleter((sender, command, label, args) -> List.of());
-        }
+        if (getConfig().contains("orbital")) { getConfig().set("orbital", null); saveConfig(); }
+        orbitals = new de.lpchat.orbital.OrbitalEngine(this);
+        orbitalCommand = new de.lpchat.orbital.OrbitalCommand(this, orbitals);
+        getServer().getPluginManager().registerEvents(orbitalCommand, this);
         if (getConfig().getBoolean("attribute-swapping.enabled", true)) {
             try {
                 attributeSwapping = PaperAttributeSwapping.enable();

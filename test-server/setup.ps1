@@ -2,7 +2,7 @@ $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Set-Location -LiteralPath $PSScriptRoot
-$headers = @{ 'User-Agent' = 'LPChat-TestServer/1.3.0 (https://github.com/Tobias30yt/LPChat)' }
+$headers = @{ 'User-Agent' = 'LPChat-TestServer/1.3.1 (https://github.com/Tobias30yt/LPChat)' }
 
 foreach ($artifact in (Get-Content -LiteralPath 'downloads.json' -Raw | ConvertFrom-Json)) {
     $destination = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot $artifact.path))
@@ -28,8 +28,8 @@ foreach ($artifact in (Get-Content -LiteralPath 'downloads.json' -Raw | ConvertF
 }
 
 # Explicit setup installs this development version. launch.bat never copies an old build over an auto-update.
-$localPlugin = Join-Path $PSScriptRoot '..\target\LPChat-1.3.0.jar'
-if (-not (Test-Path -LiteralPath $localPlugin)) { throw 'LPChat-1.3.0.jar fehlt. Im Projekt zuerst mvn verify ausfuehren.' }
+$localPlugin = Join-Path $PSScriptRoot '..\target\LPChat-1.3.1.jar'
+if (-not (Test-Path -LiteralPath $localPlugin)) { throw 'LPChat-1.3.1.jar fehlt. Im Projekt zuerst mvn verify ausfuehren.' }
 Copy-Item -LiteralPath $localPlugin -Destination (Join-Path $PSScriptRoot 'plugins\LPChat.jar') -Force
 if (Test-Path -LiteralPath 'spigot.yml') {
     $spigotText = Get-Content -LiteralPath 'spigot.yml' -Raw

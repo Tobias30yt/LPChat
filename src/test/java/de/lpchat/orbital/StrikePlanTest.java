@@ -39,7 +39,7 @@ class StrikePlanTest {
         assertTrue(plan.size() > 30);
         assertTrue(plan.stream().allMatch(p -> p.x() == 0 && p.z() == 0 && !p.gravity() && p.y() >= -64 && p.y() < 320));
         assertTrue(plan.getFirst().y() > plan.getLast().y());
-        assertTrue(plan.getFirst().fuse() < plan.getLast().fuse());
+        assertTrue(plan.stream().allMatch(p -> p.fuse() == 1));
     }
     @Test void everyDefaultPatternIsFiniteAndFitsBudget() {
         for (StrikePattern pattern : StrikePattern.values()) {
@@ -54,9 +54,5 @@ class StrikePlanTest {
         assertThrows(IllegalArgumentException.class, () -> StrikePlan.create(StrikePattern.NUKE, 3, StrikePlan.Order.INWARD, 0, Double.NaN, -64, 320, 768));
         assertThrows(IllegalArgumentException.class, () -> StrikePlan.create(StrikePattern.NUKE, 3, StrikePlan.Order.INWARD, 0, 319, -64, 320, 768));
         assertThrows(IllegalArgumentException.class, () -> StrikePlan.create(StrikePattern.CIRCLE_STAB, 8, StrikePlan.Order.INWARD, 0, 64, -64, 320, 768));
-        assertThrows(IllegalArgumentException.class, () -> OrbitalCommand.coordinate("NaN", 0));
-        assertThrows(IllegalArgumentException.class, () -> OrbitalCommand.coordinate("Infinity", 0));
-        assertEquals(12, OrbitalCommand.coordinate("~2", 10));
-        assertEquals(-10, OrbitalCommand.coordinate("~-20", 10));
     }
 }

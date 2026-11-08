@@ -16,7 +16,7 @@ ohne Praefix entfaellt auch dessen Zwischenraum. Die Nachrichtenfarbe ist standa
 
 ## Installation
 
-1. `target/LPChat-1.3.0.jar` in den `plugins`-Ordner des Servers kopieren (alte LPChat-JAR ersetzen).
+1. `target/LPChat-1.3.1.jar` in den `plugins`-Ordner des Servers kopieren (alte LPChat-JAR ersetzen).
 2. LuckPerms installieren. Fuer Teams auch UltimateTeams und PlaceholderAPI installieren.
 3. Server neu starten. Die Einstellungen entstehen unter `plugins/LPChat/config.yml`.
 4. Andere Plugins, die den oeffentlichen Chat formatieren, entsprechend deaktivieren,
@@ -173,76 +173,25 @@ ausgelegt. Falls die interne Einstellung nicht verfuegbar ist, meldet LPChat das
 die Chatfunktionen laufen weiter. Es werden keine zusaetzlichen Schadenswerte oder
 Cooldowns simuliert. Andere Kampf- oder Anti-Cheat-Plugins koennen Swaps weiterhin beeinflussen.
 
-## Orbitals (ab 1.3.0)
+## Orbitals (ab 1.3.1)
 
-Eigenstaendige Paper-Implementierung von **tobias30**, inspiriert von den
-TNT-Ringen und Stab-Schuesse bei [cubicmetre](https://www.youtube.com/watch?v=q78LRgHt_zU).
-Das verlinkte [OrbitalStrike+](https://modrinth.com/mod/orbital-strike-plus) ist eine
-Fabric-Mod ohne verlinkten Quellcode (ARR). Deren Code oder JAR wird nicht verwendet.
-Dies ist kein offizieller Port und kein vollstaendiger Ersatz aller 23 Mod-Waffen:
-Text-Schuesse, Kreaturen-Armeen, Railgun und Stasis sind nicht enthalten.
+Nur Tobias30: Eine normale Angel auswerfen und einholen. Normales Auswerfen waehlt
+Nuke, Schleichen beim Auswerfen waehlt Stab. Andere Spieler angeln unveraendert.
+Die Angel zerbricht beim erfolgreichen Ausloesen, auch im Kreativmodus.
+Beim Einholen wird der erste feste Block in Blickrichtung als Ziel festgelegt
+(maximal 128 Bloecke); ohne Block kein Schuss und kein Verbrauch.
+Stab erscheint nach 60 Serverticks (3 Sekunden bei 20 TPS) als senkrechte TNT-Saeule.
+Alle TNTs dieser Saeule explodieren gemeinsam im ersten Tick nach dem Erscheinen.
+Nuke faechert seine Ringe ueber dem anvisierten Block auf.
 
-**Ausschliesslich Spielername `Tobias30`** darf Befehle, Vorschau und Angelschuesse
-verwenden. Andere Operatoren, Konsole und uebergebene Angeln umgehen diese Pruefung
-nicht. Tobias30 benoetigt dafuer keinen OP-Status. Die Einschraenkung gilt nur fuer
-Orbitals; Chat- und Namensfarben behalten ihre bisherigen Berechtigungen.
-Auf dem Testserver bleibt `online-mode=true`, sodass Minecraft den Spielernamen prueft.
-
-```text
-/ob give nuke 5 true
-/ob give stab 1 true
-/ob give compressed_nuke 5 true outward
-/ob preview nuke 5
-/ob nuke ~ ~ ~ 5 inward
-/ob stab ~ ~ ~
-/ob cancel
-```
-
-`/orbital` und `/ob` sind identisch. `/ob give <Muster> [Groesse] [unendlich] [Reihenfolge]`
-gibt eine Angel. Auswerfen, dann Einholen: Ziel ist die Position des Hakens.
-`unendlich` ist standardmaessig `true`; bei `false` verschwindet die Angel nach einem
-erfolgreichen Schuss. Eine gesperrte/fehlgeschlagene Ausloesung verbraucht sie nicht.
-Ohne Koordinaten zielt `/ob <Muster>` auf den anvisierten Block (bis 128 Bloecke).
-Mit Koordinaten immer **x y z**, auch beim Stab; `~`-Koordinaten sind erlaubt.
-Tab-Vervollstaendigung zeigt die Muster, `/ob help` die eigene Befehlssyntax.
-
-Enthaltene TNT-Muster: `nuke`, `compressed_nuke`, `stab`, `cluster`, `cross`,
-`x_shot`, `ring`, `line`, `hexagon`, `pentagon`, `star`, `star_of_david`, `heart`,
-`scatter`, `grid`. Zusaetzliche Saeulenmuster: `circle_stab`, `cross_stab`, `x_stab`,
-`ring_stab`, `trench_stab`, `hexagon_stab`, `pentagon_stab`, `star_stab`,
-`star_of_david_stab`, `heart_stab`, `scatter_stab`, `grid_stab`.
-Bei Nuke, Compressed Nuke und Circle Stab ist Groesse die Ringzahl (1-8), sonst
-die Ausdehnung in Bloecken (1-48). Beim einfachen Stab ist sie ohne Wirkung.
-
-Nuke-TNT faechert von einer kompakten Formation in konzentrische Ringe auf;
-Compressed Nuke laesst die fertigen Ringe fallen. `simultaneous` (Standard),
-`inward` und `outward` steuern die Zuendfolge. Alle Flugkoerper sind echte TNT-Entities.
-Standard: 5 Ringe, 181 TNTs, ungefaehr 2,5 Sekunden Flugzeit. Stab bildet eine
-vertikale Kette bis zur unteren Welthoehe, von oben nach unten gezuendet.
-Es wird kein Bedrock per Block-API entfernt; normale TNT-Regeln und
-Explosionsereignisse fuer Schutzplugins bleiben aktiv. Terrain, Wasser und
-TNT-Wechselwirkungen beeinflussen das Ergebnis. Eine bildgenaue Nachbildung
-der Mk6-Redstone-Maschine wird nicht behauptet; der visuelle Client-Vergleich ist offen.
-
-In **spigot.yml**, danach vollstaendiger Neustart:
-
-```yaml
-world-settings:
-  default:
-    max-tnt-per-tick: -1
-```
-
-Auch explizite Werte fuer einzelne Welten pruefen. Das
-[Paper-TNT-Limit](https://docs.papermc.io/paper/reference/spigot-configuration/#world-settings_default_max-tnt-per-tick)
-wuerde sonst die Ringformation zeitlich auseinanderziehen. LPChat lehnt zu grosse
-Schuesse bei aktivem Limit ab. Die Testserver-Einrichtung setzt diesen Wert selbst.
-
-`orbital` in LPChats config.yml: `enabled: true`, `cooldown-seconds: 10`,
-`max-active-strikes: 2`, `max-tnt-per-strike: 1024`, `explosion-power: 4`.
-Diese Standardwerte gelten auch fuer bestehende Konfigurationsdateien.
-Grosse Stab-Formationen koennen das Limit erreichen; dann kleinere Groesse waehlen.
-Zielgebiet muss geladen sein und innerhalb der Weltgrenze liegen. Beim Deaktivieren
-des Plugins werden seine verbliebenen TNTs entfernt. Keine fremden TNTs werden geloescht.
+Keine Orbital-Befehle, keine Orbital-Tab-Vorschlaege, kein Cooldown und keine
+Orbital-Einstellungen in LPChats config.yml. Alte Orbital-Eintraege werden beim
+Start entfernt. Zwei gleichzeitig aktive/vorgemerkte Schuesse bleiben als
+Mengenlimit bestehen; dies ist keine zeitliche Abklingzeit.
+Die technische Paper-Einstellung max-tnt-per-tick bleibt im Testserver auf -1,
+damit echte TNT-Entities gleichzeitig simuliert werden.
+Eigene Umsetzung, kein Original-Port von OrbitalStrike+. Bedrock bleibt erhalten.
+Ein bildgenauer Vergleich mit cubicmetre im Minecraft-Client steht aus.
 
 ## Bauen und pruefen
 

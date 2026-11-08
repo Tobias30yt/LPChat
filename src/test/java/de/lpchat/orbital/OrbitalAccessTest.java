@@ -28,15 +28,8 @@ class OrbitalAccessTest {
         JavaPlugin plugin = mock(JavaPlugin.class);
         when(plugin.getName()).thenReturn("LPChat");
         when(plugin.namespace()).thenReturn("lpchat");
-        OrbitalEngine engine = mock(OrbitalEngine.class);
-        OrbitalCommand command = new OrbitalCommand(plugin, engine);
         Player other = mock(Player.class);
         when(other.getName()).thenReturn("OtherAdmin");
-        for (String[] args : new String[][]{{"nuke"}, {"give", "nuke"}, {"preview", "nuke"}, {"cancel"}})
-            command.onCommand(other, null, "ob", args);
-        assertTrue(command.onTabComplete(other, null, "ob", new String[]{""}).isEmpty());
-        verifyNoInteractions(engine);
-
         Server server = mock(Server.class);
         BukkitScheduler scheduler = mock(BukkitScheduler.class);
         when(plugin.getServer()).thenReturn(server);

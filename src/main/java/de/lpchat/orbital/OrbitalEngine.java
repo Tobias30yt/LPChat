@@ -18,7 +18,6 @@ public final class OrbitalEngine implements AutoCloseable {
     private record Active(List<TNTPrimed> entities, long expires) {}
     private final JavaPlugin plugin;
     private final List<Active> active = new ArrayList<>();
-    private final Map<UUID, Long> cooldowns = new HashMap<>();
     private final BukkitTask cleanup;
 
     public OrbitalEngine(JavaPlugin plugin) {
@@ -30,20 +29,16 @@ public final class OrbitalEngine implements AutoCloseable {
         OrbitalAccess.require(source);
         prune();
         long now = System.nanoTime();
-        if (source != null && cooldowns.getOrDefault(source.getUniqueId(), 0L) > now)
-            throw new IllegalArgumentException("Orbital-Cooldown laeuft noch.");
-        int maxActive = bounded("max-active-strikes", 2, 1, 8);
+        int maxActive = 2;
         if (active.size() >= maxActive) throw new IllegalArgumentException("Es laufen bereits zu viele Orbital-Schuesse.");
-        int maxTnt = bounded("max-tnt-per-strike", 1024, 1, 4096);
+        int maxTnt = 1024;
         World world = target.getWorld();
         List<StrikePlan.Payload> plan = StrikePlan.create(pattern, size, order, target.getYaw(),
                 target.getY(), world.getMinHeight(), world.getMaxHeight(), maxTnt);
         validateArea(target, pattern.points(size, target.getYaw()));
         checkTickLimit(world, plan.size());
         List<TNTPrimed> spawned = new ArrayList<>();
-        float yield = (float) Math.clamp(plugin.getConfig().getDouble("orbital.explosion-power", 4), 1, 8);
-        if (!Float.isFinite(yield)) yield = 4;
-        final float power = yield;
+        final float power = 4;
         try {
             for (StrikePlan.Payload p : plan) {
                 Location start = new Location(world, target.getX() + p.x(), p.y(), target.getZ() + p.z());
@@ -65,7 +60,6 @@ public final class OrbitalEngine implements AutoCloseable {
         }
         // A wall-clock expiry also removes suspended TNT if chunks stop ticking.
         active.add(new Active(spawned, now + 30_000_000_000L));
-        if (source != null) cooldowns.put(source.getUniqueId(), now + bounded("cooldown-seconds", 10, 0, 3600) * 1_000_000_000L);
         plugin.getLogger().info("Orbital " + pattern.id() + ": " + spawned.size() + " TNT, "
                 + (source == null ? "Konsole" : source.getName()) + ", " + world.getName()
                 + " " + target.getBlockX() + " " + target.getBlockY() + " " + target.getBlockZ());
@@ -110,9 +104,6 @@ public final class OrbitalEngine implements AutoCloseable {
             if (!world.isChunkLoaded(x, z)) throw new IllegalArgumentException("Zielgebiet ist nicht geladen. Gehe naeher heran.");
     }
 
-    private int bounded(String key, int fallback, int min, int max) {
-        return Math.clamp(plugin.getConfig().getInt("orbital." + key, fallback), min, max);
-    }
     private void prune() {
         long now = System.nanoTime();
         active.removeIf(a -> {
@@ -120,7 +111,6 @@ public final class OrbitalEngine implements AutoCloseable {
             a.entities.removeIf(t -> t.isDead());
             return a.entities.isEmpty();
         });
-        cooldowns.values().removeIf(expiry -> now >= expiry);
     }
     public int cancelAll() {
         int count = active.stream().mapToInt(a -> a.entities.size()).sum();
@@ -128,5 +118,5 @@ public final class OrbitalEngine implements AutoCloseable {
         active.clear();
         return count;
     }
-    @Override public void close() { cleanup.cancel(); cancelAll(); cooldowns.clear(); }
+    @Override public void close() { cleanup.cancel(); cancelAll(); }
 }

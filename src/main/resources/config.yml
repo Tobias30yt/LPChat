@@ -1,14 +1,5 @@
 # LuckPerms-Praefixe: legacy fuer &4Supporter, minimessage fuer <dark_red>Supporter.
 prefix-format: legacy
-# Eigene Paper-Orbitals. Nur Spielername Tobias30, unabhaengig von OP/Rechten.
-# Echter TNT-Schaden, Standard-Explosionsereignisse bleiben aktiv.
-# spigot.yml: world-settings.default.max-tnt-per-tick: -1 erforderlich fuer grosse Schuesse.
-orbital:
-  enabled: true
-  cooldown-seconds: 10
-  max-active-strikes: 2
-  max-tnt-per-strike: 1024
-  explosion-power: 4
 default-chat-color: white
 # Beim Start neuestes stabiles Release aus Tobias30yt/LPChat pruefen und herunterladen.
 # Installation erfolgt durch Paper beim DARAUFFOLGENDEN Serverstart.

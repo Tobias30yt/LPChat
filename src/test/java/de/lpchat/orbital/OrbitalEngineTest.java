@@ -73,8 +73,8 @@ class OrbitalEngineTest {
                 verify(tnt).setYield(4);
                 verify(tnt).setVelocity(any());
             }
-            assertThrows(IllegalArgumentException.class, () -> engine.fire(player, new Location(world, 0, 64, 0), StrikePattern.NUKE, 5, StrikePlan.Order.SIMULTANEOUS));
-            assertEquals(181, engine.cancelAll());
+            assertEquals(181, engine.fire(player, new Location(world, 0, 64, 0), StrikePattern.NUKE, 5, StrikePlan.Order.SIMULTANEOUS));
+            assertEquals(362, engine.cancelAll());
             for (TNTPrimed tnt : spawned) verify(tnt).remove();
             assertEquals(0, engine.cancelAll());
         }

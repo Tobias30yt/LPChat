@@ -28,7 +28,7 @@ public final class StrikePlan {
             for (StrikePattern.Point p : points) {
                 int depth = 0;
                 for (double y = top; y >= minY + 1; y -= 5) {
-                    add(out, new Payload(p.x(), y, p.z(), 0, 0, 0, 25 + depth * 2, false), maxTnt);
+                    add(out, new Payload(p.x(), y, p.z(), 0, 0, 0, 1, false), maxTnt);
                     depth++;
                 }
             }

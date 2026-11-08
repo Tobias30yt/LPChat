@@ -20,13 +20,14 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 class OrbitalRodTest {
+    JavaPlugin plugin;
     OrbitalCommand command;
     OrbitalEngine engine;
     Player player;
     PlayerInventory inventory;
     FishHook hook;
     @BeforeEach void setup() {
-        JavaPlugin plugin = mock(JavaPlugin.class);
+        plugin = mock(JavaPlugin.class);
         when(plugin.namespace()).thenReturn("lpchat");
         engine = mock(OrbitalEngine.class);
         command = new OrbitalCommand(plugin, engine);
@@ -49,6 +50,11 @@ class OrbitalRodTest {
         World world = mock(World.class);
         when(hook.getLocation()).thenReturn(new Location(world, 10, 64, 10));
         when(player.getLocation()).thenReturn(new Location(world, 0, 64, 0));
+        when(player.getEyeLocation()).thenReturn(new Location(world, 0, 65, 0));
+        when(world.isChunkLoaded(anyInt(), anyInt())).thenReturn(true);
+        when(world.getMinHeight()).thenReturn(-64);
+        when(world.getMaxHeight()).thenReturn(320);
+        when(world.getBlockAt(any(Location.class))).thenReturn(mock(org.bukkit.block.Block.class));
     }
     private PlayerFishEvent event(PlayerFishEvent.State state) {
         PlayerFishEvent event = mock(PlayerFishEvent.class);
@@ -64,15 +70,15 @@ class OrbitalRodTest {
         var cast = event(PlayerFishEvent.State.FISHING);
         command.onFish(cast);
         command.onFish(event(PlayerFishEvent.State.REEL_IN));
-        verify(cast).setCancelled(true);
+        verify(cast, never()).setCancelled(true);
         verifyNoInteractions(engine);
     }
-    @Test void tobiasCanFireOnceOnRetrievalAndInfiniteRodIsRetained() {
+    @Test void tobiasCanFireOnceAndNormalRodBreaks() {
         command.onFish(event(PlayerFishEvent.State.FISHING));
         command.onFish(event(PlayerFishEvent.State.REEL_IN));
         command.onFish(event(PlayerFishEvent.State.REEL_IN));
         verify(engine, times(1)).fire(eq(player), any(Location.class), eq(StrikePattern.NUKE), eq(5), eq(StrikePlan.Order.SIMULTANEOUS));
-        verify(inventory, never()).setItem(any(EquipmentSlot.class), any(ItemStack.class));
+        verify(inventory).setItem(eq(EquipmentSlot.HAND), isNull());
         verify(hook).remove();
     }
     @Test void switchingRodsCannotTriggerSavedShot() {
@@ -80,6 +86,22 @@ class OrbitalRodTest {
         when(inventory.getItem(EquipmentSlot.HAND)).thenReturn(null);
         command.onFish(event(PlayerFishEvent.State.REEL_IN));
         verifyNoInteractions(engine);
+    }
+    @Test void stabWaitsSixtyTicksBeforeSpawning() {
+        var server = mock(org.bukkit.Server.class);
+        var scheduler = mock(org.bukkit.scheduler.BukkitScheduler.class);
+        when(plugin.getServer()).thenReturn(server);
+        when(server.getScheduler()).thenReturn(scheduler);
+        when(scheduler.runTaskLater(eq(plugin), any(Runnable.class), eq(60L))).thenReturn(mock(org.bukkit.scheduler.BukkitTask.class));
+        when(player.isSneaking()).thenReturn(true);
+        when(player.isOnline()).thenReturn(true);
+        command.onFish(event(PlayerFishEvent.State.FISHING));
+        command.onFish(event(PlayerFishEvent.State.REEL_IN));
+        verifyNoInteractions(engine);
+        var callback = org.mockito.ArgumentCaptor.forClass(Runnable.class);
+        verify(scheduler).runTaskLater(eq(plugin), callback.capture(), eq(60L));
+        callback.getValue().run();
+        verify(engine).fire(eq(player), any(Location.class), eq(StrikePattern.STAB), eq(1), eq(StrikePlan.Order.SIMULTANEOUS));
     }
     @Test void cancelledFishingIsPreserved() {
         var cast = event(PlayerFishEvent.State.FISHING);
