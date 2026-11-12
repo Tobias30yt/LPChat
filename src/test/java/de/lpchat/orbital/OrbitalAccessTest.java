@@ -33,6 +33,7 @@ class OrbitalAccessTest {
         Server server = mock(Server.class);
         BukkitScheduler scheduler = mock(BukkitScheduler.class);
         when(plugin.getServer()).thenReturn(server);
+        when(server.getPluginManager()).thenReturn(mock(org.bukkit.plugin.PluginManager.class));
         when(server.getScheduler()).thenReturn(scheduler);
         when(scheduler.runTaskTimer(eq(plugin), any(Runnable.class), eq(1L), eq(1L))).thenReturn(mock(BukkitTask.class));
         when(plugin.getConfig()).thenReturn(new YamlConfiguration());

@@ -1,5 +1,5 @@
 name: LPChat
-version: 1.3.2
+version: 1.3.3
 author: tobias30
 main: de.lpchat.LPChatPlugin
 api-version: '26.2'

@@ -34,6 +34,7 @@ class OrbitalEngineTest {
         Server.Spigot serverSpigot = mock(Server.Spigot.class);
         BukkitScheduler scheduler = mock(BukkitScheduler.class);
         when(plugin.getServer()).thenReturn(server);
+        when(server.getPluginManager()).thenReturn(mock(org.bukkit.plugin.PluginManager.class));
         when(plugin.getLogger()).thenReturn(Logger.getAnonymousLogger());
         when(server.getScheduler()).thenReturn(scheduler);
         when(server.spigot()).thenReturn(serverSpigot);
@@ -57,6 +58,7 @@ class OrbitalEngineTest {
         when(world.spawn(any(Location.class), eq(TNTPrimed.class), any(Consumer.class))).thenAnswer(call -> {
             TNTPrimed tnt = mock(TNTPrimed.class);
             when(tnt.getWorld()).thenReturn(world);
+            when(tnt.getUniqueId()).thenReturn(UUID.randomUUID());
             ((Consumer<TNTPrimed>) call.getArgument(2)).accept(tnt);
             spawned.add(tnt);
             return tnt;
@@ -90,6 +92,23 @@ class OrbitalEngineTest {
             when(world.getWorldBorder().isInside(any())).thenReturn(false);
             assertThrows(IllegalArgumentException.class, () -> engine.fire(player, new Location(world, 0, 64, 0), StrikePattern.NUKE, 5, StrikePlan.Order.SIMULTANEOUS));
             assertTrue(spawned.isEmpty());
+        }
+    }
+    @Test void drillAddsSolidColumnButPreservesBedrockAndCancellation() {
+        var block = mock(org.bukkit.block.Block.class);
+        when(world.getBlockAt(any(Location.class))).thenReturn(block);
+        try (OrbitalEngine engine = new OrbitalEngine(plugin)) {
+            engine.fire(player, new Location(world, 0, 64, 0), StrikePattern.STAB, 1, StrikePlan.Order.SIMULTANEOUS);
+            for (int i = 0; i < 3; i++) {
+                var event = mock(org.bukkit.event.entity.EntityExplodeEvent.class);
+                when(event.getEntity()).thenReturn(spawned.get(i));
+                var blocks = new ArrayList<org.bukkit.block.Block>();
+                when(event.blockList()).thenReturn(blocks);
+                when(block.getType()).thenReturn(i == 0 ? org.bukkit.Material.BEDROCK : org.bukkit.Material.DEEPSLATE);
+                when(event.isCancelled()).thenReturn(i == 2);
+                engine.onExplosion(event);
+                assertEquals(i == 1 ? 1 : 0, blocks.size());
+            }
         }
     }
     @Test void disableRemovesOutstandingPayloadAndPreviewDoesNotSpawnTnt() {

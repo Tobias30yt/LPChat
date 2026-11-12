@@ -57,6 +57,7 @@ public final class LPChatPlugin extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(nameMenu, this);
         getServer().getPluginManager().registerEvents(this, this);
         if (getConfig().contains("orbital")) { getConfig().set("orbital", null); saveConfig(); }
+        new PaperTntLimit(this).enable();
         orbitals = new de.lpchat.orbital.OrbitalEngine(this);
         orbitalCommand = new de.lpchat.orbital.OrbitalCommand(this, orbitals);
         getServer().getPluginManager().registerEvents(orbitalCommand, this);

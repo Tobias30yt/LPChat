@@ -9,7 +9,7 @@ In Minecraft Java **26.2** verbinden mit **127.0.0.1:25566**. Der Server ist abs
 nur auf diesem Computer erreichbar. Anmeldung mit einem Minecraft-Konto bleibt aktiv.
 Serverkonsole mit `stop` beenden.
 
-Enthalten: Paper 26.2 Build 135, LPChat 1.3.2, LuckPerms 5.5.71,
+Enthalten: Paper 26.2 Build 135, LPChat 1.3.3, LuckPerms 5.5.71,
 PlaceholderAPI 2.12.3 und UltimateTeams (Modrinth 5.1, Dateiname 5.0.4).
 Downloads werden gegen die Hersteller-Pruefsummen aus `downloads.json` geprueft.
 Beim ersten Start laedt Paper weitere Minecraft-/Plugin-Bibliotheken nach.

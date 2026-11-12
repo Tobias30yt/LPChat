@@ -14,14 +14,16 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
-public final class OrbitalEngine implements AutoCloseable {
+public final class OrbitalEngine implements AutoCloseable, org.bukkit.event.Listener {
     private record Active(List<TNTPrimed> entities, long expires) {}
     private final JavaPlugin plugin;
+    private final Map<UUID, Location> drillBlocks = new HashMap<>();
     private final List<Active> active = new ArrayList<>();
     private final BukkitTask cleanup;
 
     public OrbitalEngine(JavaPlugin plugin) {
         this.plugin = plugin;
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
         cleanup = plugin.getServer().getScheduler().runTaskTimer(plugin, this::prune, 1, 1);
     }
 
@@ -48,14 +50,16 @@ public final class OrbitalEngine implements AutoCloseable {
                     entity.setYield(power);
                     entity.setIsIncendiary(false);
                     entity.setGravity(p.gravity());
+                    if (pattern.stab()) entity.setNoPhysics(true);
                     entity.setVelocity(new Vector(p.vx(), p.vy(), p.vz()));
                     entity.setPersistent(false);
                     entity.addScoreboardTag("lpchat_orbital");
                 });
                 spawned.add(tnt);
+                if (pattern.stab()) drillBlocks.put(tnt.getUniqueId(), start);
             }
         } catch (RuntimeException exception) {
-            spawned.forEach(TNTPrimed::remove);
+            spawned.forEach(t -> { drillBlocks.remove(t.getUniqueId()); t.remove(); });
             throw exception;
         }
         // A wall-clock expiry also removes suspended TNT if chunks stop ticking.
@@ -64,6 +68,15 @@ public final class OrbitalEngine implements AutoCloseable {
                 + (source == null ? "Konsole" : source.getName()) + ", " + world.getName()
                 + " " + target.getBlockX() + " " + target.getBlockY() + " " + target.getBlockZ());
         return spawned.size();
+    }
+
+    @org.bukkit.event.EventHandler(priority = org.bukkit.event.EventPriority.LOWEST)
+    public void onExplosion(org.bukkit.event.entity.EntityExplodeEvent event) {
+        Location centre = drillBlocks.remove(event.getEntity().getUniqueId());
+        if (centre == null || event.isCancelled()) return;
+        org.bukkit.block.Block block = centre.getBlock();
+        if (block.getType() != org.bukkit.Material.BEDROCK && !block.isEmpty()
+                && !event.blockList().contains(block)) event.blockList().add(block);
     }
 
     private void checkTickLimit(World world, int count) {
@@ -107,8 +120,8 @@ public final class OrbitalEngine implements AutoCloseable {
     private void prune() {
         long now = System.nanoTime();
         active.removeIf(a -> {
-            if (now >= a.expires) { a.entities.forEach(TNTPrimed::remove); return true; }
-            a.entities.removeIf(t -> t.isDead());
+            if (now >= a.expires) { a.entities.forEach(t -> { drillBlocks.remove(t.getUniqueId()); t.remove(); }); return true; }
+            a.entities.removeIf(t -> { if (!t.isDead()) return false; drillBlocks.remove(t.getUniqueId()); return true; });
             return a.entities.isEmpty();
         });
     }
@@ -116,7 +129,9 @@ public final class OrbitalEngine implements AutoCloseable {
         int count = active.stream().mapToInt(a -> a.entities.size()).sum();
         active.forEach(a -> a.entities.forEach(TNTPrimed::remove));
         active.clear();
+        drillBlocks.clear();
         return count;
     }
     @Override public void close() { cleanup.cancel(); cancelAll(); }
 }
+

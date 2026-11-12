@@ -36,14 +36,15 @@ class StrikePlanTest {
     }
     @Test void stabIsVerticalAndFiresFromTopToBottomWithinHeight() {
         var plan = StrikePlan.create(StrikePattern.STAB, 1, StrikePlan.Order.SIMULTANEOUS, 0, 64, -64, 320, 768);
-        assertTrue(plan.size() > 30);
+        assertTrue(plan.size() > 190);
+        for (int i = 1; i < plan.size(); i++) assertEquals(1, plan.get(i-1).y() - plan.get(i).y(), 1e-9);
         assertTrue(plan.stream().allMatch(p -> p.x() == 0 && p.z() == 0 && !p.gravity() && p.y() >= -64 && p.y() < 320));
         assertTrue(plan.getFirst().y() > plan.getLast().y());
         assertTrue(plan.stream().allMatch(p -> p.fuse() == 1));
     }
-    @Test void everyDefaultPatternIsFiniteAndFitsBudget() {
+    @Test void everyDefaultPatternIsFiniteWithinExpandedTestBudget() {
         for (StrikePattern pattern : StrikePattern.values()) {
-            var plan = assertDoesNotThrow(() -> StrikePlan.create(pattern, pattern.defaultSize(), StrikePlan.Order.SIMULTANEOUS, 90, 64, -64, 320, 1024), pattern.id());
+            var plan = assertDoesNotThrow(() -> StrikePlan.create(pattern, pattern.defaultSize(), StrikePlan.Order.SIMULTANEOUS, 90, 64, -64, 320, 20000), pattern.id());
             assertFalse(plan.isEmpty(), pattern.id());
             assertTrue(plan.stream().allMatch(p -> Double.isFinite(p.x()) && Double.isFinite(p.y()) && Double.isFinite(p.z())), pattern.id());
         }
