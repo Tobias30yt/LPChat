@@ -64,9 +64,7 @@ public final class OrbitalEngine implements AutoCloseable, org.bukkit.event.List
         }
         // A wall-clock expiry also removes suspended TNT if chunks stop ticking.
         active.add(new Active(spawned, now + 30_000_000_000L));
-        plugin.getLogger().info("Orbital " + pattern.id() + ": " + spawned.size() + " TNT, "
-                + (source == null ? "Konsole" : source.getName()) + ", " + world.getName()
-                + " " + target.getBlockX() + " " + target.getBlockY() + " " + target.getBlockZ());
+
         return spawned.size();
     }
 

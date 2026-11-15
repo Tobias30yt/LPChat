@@ -7,7 +7,6 @@ import org.bukkit.entity.Player;
 
 final class TeamHook {
     private final LPChatPlugin plugin;
-    private boolean warned;
 
     TeamHook(LPChatPlugin plugin) { this.plugin = plugin; }
 
@@ -25,11 +24,6 @@ final class TeamHook {
             String placeholder = plugin.getConfig().getString("teams.name-placeholder", "%ultimateteams_team_name%");
             String name = PlaceholderAPI.setPlaceholders(player, placeholder).strip();
             if (name.equals(placeholder)) {
-                if (!warned) {
-                    warned = true;
-                    plugin.getLogger().warning("UltimateTeams-Platzhalter wird nicht aufgeloest: " + placeholder
-                            + ". UltimateTeams-Expansion in PlaceholderAPI pruefen.");
-                }
                 return Component.empty();
             }
             Component component = ChatFormat.legacy(name);
@@ -40,10 +34,6 @@ final class TeamHook {
                     && empty.stream().anyMatch(plain::equalsIgnoreCase))) return Component.empty();
             return component;
         } catch (RuntimeException exception) {
-            if (!warned) {
-                warned = true;
-                plugin.getLogger().warning("UltimateTeams-Platzhalter nicht lesbar: " + exception.getMessage());
-            }
             return Component.empty();
         }
     }

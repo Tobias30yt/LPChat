@@ -16,7 +16,7 @@ ohne Praefix entfaellt auch dessen Zwischenraum. Die Nachrichtenfarbe ist standa
 
 ## Installation
 
-1. `target/LPChat-1.3.3.jar` in den `plugins`-Ordner des Servers kopieren (alte LPChat-JAR ersetzen).
+1. `target/LPChat-1.3.4.jar` in den `plugins`-Ordner des Servers kopieren (alte LPChat-JAR ersetzen).
 2. LuckPerms installieren. Fuer Teams auch UltimateTeams und PlaceholderAPI installieren.
 3. Server neu starten. Die Einstellungen entstehen unter `plugins/LPChat/config.yml`.
 4. Andere Plugins, die den oeffentlichen Chat formatieren, entsprechend deaktivieren,
@@ -57,7 +57,7 @@ atomar bereitgestellt. Bei Netzwerk-/Prueffehlern laeuft die installierte Versio
 Wenn das neueste Release eine neuere Minecraft-/Java-Version voraussetzt, wird es
 nicht installiert. Netzwerkzugriff auf GitHub und dessen Release-Downloadserver sowie
 ein aktivierter, beschreibbarer [Paper-Updateordner](https://docs.papermc.io/paper/reference/bukkit-configuration/#settings_update-folder)
-sind erforderlich. Das Ergebnis steht im Serverlog.
+sind erforderlich. Ab 1.3.4 erfolgt die Pruefung ohne eigene Konsolenausgabe.
 
 ## Farben und Berechtigungen
 
@@ -139,7 +139,7 @@ Falls eine aeltere Expansion den Mitgliedschafts-Platzhalter nicht kennt, den
 Kein-Team-Text aus UltimateTeams unter `teams.empty-values` eintragen. Bei bestaetigter
 Teammitgliedschaft werden echte Teams mit Namen wie `None` oder `Kein Team` angezeigt.
 Fehlt die Expansion trotz aktivem PlaceholderAPI, wird ein nicht aufgeloester Teamname
-ausgeblendet und einmalig im Serverlog gemeldet.
+ohne Konsolenmeldung ausgeblendet.
 
 Die Integrationstests verwenden die unveraenderte, auf Modrinth als **5.1** veroeffentlichte
 UltimateTeams-JAR (Versions-ID `bWbGjJKk`, Dateiname `UltimateTeams-5.0.4.jar`).
@@ -169,7 +169,7 @@ zurueckgenommen. Nach einem Paper-Konfigurationsreload kann die Einstellung wied
 Papers Dateiwert entsprechen; zum erneuten Aktivieren den Server neu starten.
 
 Der Zugriff erfolgt ueber Papers interne Konfigurationsklasse und ist fuer Paper 26.2
-ausgelegt. Falls die interne Einstellung nicht verfuegbar ist, meldet LPChat das im Log;
+ausgelegt. Falls die interne Einstellung nicht verfuegbar ist, bleibt sie unveraendert;
 die Chatfunktionen laufen weiter. Es werden keine zusaetzlichen Schadenswerte oder
 Cooldowns simuliert. Andere Kampf- oder Anti-Cheat-Plugins koennen Swaps weiterhin beeinflussen.
 
@@ -201,7 +201,7 @@ Fuer den abschliessenden Servertest:
 4. Berechtigung entfernen: Folgende Nachrichten nutzen die Standardfarbe.
 5. Im Menue Shift-Klick, Zahlentasten, Doppelklick und Ziehen pruefen: keine Gegenstaende entnehmbar.
 6. UltimateTeams-Team-/Allychat pruefen: keine Nachrichten bei unbeteiligten Spielern.
-7. Startmeldung `Attribute-Swapping aktiviert` pruefen und Waffen-Swaps im Spiel testen.
+7. Waffen-Swaps im Spiel testen.
 8. `attribute-swapping.enabled: false` setzen und neu starten: Papers eigene Einstellung gilt.
 9. `/namecolor` und `/namecolor gradient` durchklicken; Farbe nach Aus-/Einloggen und Neustart pruefen.
 10. Namensfarbe/Verlauf, `>>` und unabhaengige Nachrichtenfarbe gemeinsam pruefen.

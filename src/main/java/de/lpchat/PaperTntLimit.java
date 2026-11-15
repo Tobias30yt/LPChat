@@ -24,9 +24,9 @@ final class PaperTntLimit implements Listener {
             var config = plugin.getServer().spigot().getSpigotConfig();
             config.set("world-settings." + world.getName() + ".max-tnt-per-tick", -1);
             config.set("world-settings." + world.getKey() + ".max-tnt-per-tick", -1);
-            plugin.getLogger().info("max-tnt-per-tick = -1 fuer " + world.getKey());
+
         } catch (ReflectiveOperationException | RuntimeException | LinkageError e) {
-            plugin.getLogger().warning("TNT-Limit konnte fuer " + world.getName() + " nicht gesetzt werden: " + e);
+            // Console diagnostics intentionally disabled.
         }
     }
     static void setUnlimited(Object settings) throws ReflectiveOperationException {

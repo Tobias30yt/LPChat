@@ -16,6 +16,13 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class LPChatPlugin extends JavaPlugin implements Listener {
+    public LPChatPlugin() { silenceLogger(getLogger()); }
+
+    static void silenceLogger(java.util.logging.Logger logger) {
+        logger.setLevel(java.util.logging.Level.OFF);
+        logger.setUseParentHandlers(false);
+    }
+
     private de.lpchat.orbital.OrbitalEngine orbitals;
     private de.lpchat.orbital.OrbitalCommand orbitalCommand;
     private LuckPerms luckPerms;
@@ -34,13 +41,13 @@ public final class LPChatPlugin extends JavaPlugin implements Listener {
         defaultColor = NamedTextColor.NAMES.value(getConfig().getString("default-chat-color", "white"));
         if (colors.isEmpty() || colors.size() > 16 || colors.stream().distinct().count() != colors.size()
                 || colors.stream().anyMatch(c -> NamedTextColor.NAMES.value(c) == null) || defaultColor == null) {
-            getLogger().severe("Ungueltige Farbliste oder Standardfarbe in config.yml.");
+
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
         luckPerms = getServer().getServicesManager().load(LuckPerms.class);
         if (luckPerms == null) {
-            getLogger().severe("LuckPerms-API ist nicht verfuegbar.");
+
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
@@ -65,29 +72,24 @@ public final class LPChatPlugin extends JavaPlugin implements Listener {
         if (getConfig().getBoolean("attribute-swapping.enabled", true)) {
             try {
                 attributeSwapping = PaperAttributeSwapping.enable();
-                getLogger().info("Attribute-Swapping aktiviert (Paper equipment updates = false).");
+
             } catch (ReflectiveOperationException | RuntimeException | LinkageError exception) {
-                getLogger().warning("Attribute-Swapping konnte nicht aktiviert werden: " + exception
-                        + ". Alternativ in config/paper-global.yml unter unsupported-settings "
-                        + "update-equipment-on-player-actions: false setzen und den Server neu starten.");
-            }
+            // Console diagnostics intentionally disabled.
         }
-        if (getConfig().getBoolean("teams.enabled")
-                && !getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            getLogger().warning("Team-Anzeige benoetigt PlaceholderAPI und UltimateTeams.");
         }
+
         startUpdater();
     }
 
     private void startUpdater() {
         if (!getConfig().getBoolean("auto-update.enabled", true)) return;
         if (getServer().getUpdateFolder().isBlank()) {
-            getLogger().warning("Auto-Update: Papers Updateordner ist deaktiviert (bukkit.yml).");
+
             return;
         }
         var updateDirectory = getServer().getUpdateFolderFile().toPath().toAbsolutePath().normalize();
         if (updateDirectory.equals(getDataFolder().toPath().toAbsolutePath().getParent().normalize())) {
-            getLogger().warning("Auto-Update: Der Updateordner darf nicht der plugins-Ordner selbst sein.");
+
             return;
         }
         String current = getPluginMeta().getVersion();
@@ -97,12 +99,12 @@ public final class LPChatPlugin extends JavaPlugin implements Listener {
         GitHubUpdater taskUpdater = updater;
         getServer().getScheduler().runTaskAsynchronously(this, () -> {
             try {
-                getLogger().info(taskUpdater.checkAndStage(current, minecraft, updateDirectory, fileName));
+                taskUpdater.checkAndStage(current, minecraft, updateDirectory, fileName);
             } catch (InterruptedException exception) {
                 Thread.currentThread().interrupt();
             } catch (Exception exception) {
-                getLogger().warning("Auto-Update nicht ausgefuehrt; installierte Version bleibt aktiv: " + exception.getMessage());
-            }
+            // Console diagnostics intentionally disabled.
+        }
         });
     }
 
@@ -118,7 +120,7 @@ public final class LPChatPlugin extends JavaPlugin implements Listener {
         try {
             attributeSwapping.close();
         } catch (ReflectiveOperationException | RuntimeException exception) {
-            getLogger().warning("Paper-Einstellung konnte nicht wiederhergestellt werden: " + exception);
+            // Console diagnostics intentionally disabled.
         } finally {
             attributeSwapping = null;
         }
