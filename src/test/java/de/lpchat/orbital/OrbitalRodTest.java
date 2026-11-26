@@ -32,8 +32,9 @@ class OrbitalRodTest {
         engine = mock(OrbitalEngine.class);
         command = new OrbitalCommand(plugin, engine);
         player = mock(Player.class);
-        when(player.getName()).thenReturn("Tobias30");
-        when(player.getUniqueId()).thenReturn(UUID.randomUUID());
+        when(player.getName()).thenReturn("NebelFuchs");
+        when(player.getUniqueId()).thenReturn(de.lpchat.OwnerIdentity.OWNER);
+        when(player.getUniqueId()).thenReturn(de.lpchat.OwnerIdentity.OWNER);
         inventory = mock(PlayerInventory.class);
         when(player.getInventory()).thenReturn(inventory);
         ItemStack rod = mock(ItemStack.class);
@@ -66,6 +67,7 @@ class OrbitalRodTest {
     }
     @Test void otherOperatorCannotUseBorrowedRod() {
         when(player.getName()).thenReturn("OtherAdmin");
+        when(player.getUniqueId()).thenReturn(java.util.UUID.randomUUID());
         when(player.isOp()).thenReturn(true);
         var cast = event(PlayerFishEvent.State.FISHING);
         command.onFish(cast);

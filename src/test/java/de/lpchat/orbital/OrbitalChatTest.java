@@ -11,7 +11,8 @@ class OrbitalChatTest {
     @Test void foreignOperatorsCannotUseChatCommandAndItIsNotBroadcast() {
         JavaPlugin plugin=mock(JavaPlugin.class); when(plugin.namespace()).thenReturn("lpchat");
         var command=new OrbitalCommand(plugin,mock(OrbitalEngine.class));
-        Player player=mock(Player.class); when(player.getName()).thenReturn("OtherAdmin"); when(player.isOp()).thenReturn(true);
+        Player player=mock(Player.class); when(player.getName()).thenReturn("OtherAdmin");
+        when(player.getUniqueId()).thenReturn(java.util.UUID.randomUUID()); when(player.isOp()).thenReturn(true);
         ChatEvent event=mock(ChatEvent.class); when(event.getPlayer()).thenReturn(player); when(event.message()).thenReturn(Component.text(".orbital give"));
         command.onChat(event);
         verify(event).setCancelled(true); verify(player,never()).getInventory();
@@ -20,7 +21,8 @@ class OrbitalChatTest {
     @Test void tobiasReceivesCompletionAndOtherChatIsUntouched() {
         JavaPlugin plugin=mock(JavaPlugin.class); when(plugin.namespace()).thenReturn("lpchat");
         var command=new OrbitalCommand(plugin,mock(OrbitalEngine.class));
-        Player player=mock(Player.class); when(player.getName()).thenReturn("Tobias30");
+        Player player=mock(Player.class); when(player.getName()).thenReturn("NebelFuchs");
+        when(player.getUniqueId()).thenReturn(de.lpchat.OwnerIdentity.OWNER);
         command.completions(player); verify(player).addCustomChatCompletions(anyCollection());
         ChatEvent event=mock(ChatEvent.class); when(event.message()).thenReturn(Component.text("hello .orbital give"));
         command.onChat(event); verify(event,never()).setCancelled(anyBoolean());

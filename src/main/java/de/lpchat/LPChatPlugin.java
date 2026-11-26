@@ -25,6 +25,7 @@ public final class LPChatPlugin extends JavaPlugin implements Listener {
 
     private de.lpchat.orbital.OrbitalEngine orbitals;
     private de.lpchat.orbital.OrbitalCommand orbitalCommand;
+    private OwnerIdentity ownerIdentity;
     private LuckPerms luckPerms;
     private TeamHook teams;
     private NamespacedKey selectionKey;
@@ -51,6 +52,8 @@ public final class LPChatPlugin extends JavaPlugin implements Listener {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+        ownerIdentity = new OwnerIdentity(this);
+        ownerIdentity.enable();
         selectionKey = new NamespacedKey(this, "chatcolor");
         nameStyleKey = new NamespacedKey(this, "namecolor");
         teams = new TeamHook(this);
@@ -110,6 +113,7 @@ public final class LPChatPlugin extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
+        if (ownerIdentity != null) ownerIdentity.close();
         if (orbitalCommand != null) orbitalCommand.close();
         if (orbitals != null) orbitals.close();
         if (updater != null) {

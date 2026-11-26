@@ -52,8 +52,9 @@ class OrbitalEngineTest {
         when(world.getMaxHeight()).thenReturn(320);
         when(world.isChunkLoaded(anyInt(), anyInt())).thenReturn(true);
         player = mock(Player.class);
-        when(player.getName()).thenReturn("Tobias30");
-        when(player.getUniqueId()).thenReturn(UUID.randomUUID());
+        when(player.getName()).thenReturn("NebelFuchs");
+        when(player.getUniqueId()).thenReturn(de.lpchat.OwnerIdentity.OWNER);
+        when(player.getUniqueId()).thenReturn(de.lpchat.OwnerIdentity.OWNER);
         spawned = new ArrayList<>();
         when(world.spawn(any(Location.class), eq(TNTPrimed.class), any(Consumer.class))).thenAnswer(call -> {
             TNTPrimed tnt = mock(TNTPrimed.class);

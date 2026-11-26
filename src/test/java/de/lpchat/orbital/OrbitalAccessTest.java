@@ -15,7 +15,8 @@ import static org.mockito.Mockito.*;
 class OrbitalAccessTest {
     @Test void onlyTobias30IsAllowedRegardlessOfOpOrPermissions() {
         Player tobias = mock(Player.class), other = mock(Player.class);
-        when(tobias.getName()).thenReturn("tobias30");
+        when(tobias.getName()).thenReturn("NebelFuchs");
+        when(tobias.getUniqueId()).thenReturn(de.lpchat.OwnerIdentity.OWNER);
         when(other.getName()).thenReturn("SomeoneElse");
         when(other.isOp()).thenReturn(true);
         when(other.hasPermission(anyString())).thenReturn(true);
